@@ -23,9 +23,9 @@
 (def bitlyurl-regex
      (seq->prefix-search-regex (:bitly-hosts config) ))
 
-(def bitly-user (get (System/getenv) "BITLY_USER"))
+(def bitly-user (System/getenv "BITLY_USER"))
 
-(def bitly-key (get (System/getenv) "BITLY_KEY"))
+(def bitly-key (System/getenv "BITLY_KEY"))
 
 ;;; structure
 
