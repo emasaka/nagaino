@@ -3,7 +3,8 @@
 	[ring.adapter.jetty]
 	[clojure.contrib.json :only [json-str]]
 	[nagaino.expandurls :only [expand-urls]] )
-  (:require [compojure.handler :as handler] ))
+  (:require [compojure.handler :as handler]
+	    [compojure.route :as route] ))
 
 (defn query->longurl [params]
   (-> params :query-params (get "shortUrl") expand-urls) )
@@ -14,7 +15,8 @@
 (defroutes route
   (GET "/api/v0/expand" [:as params]
        {:headers {"Content-Type" "application/json; charset=utf-8"}
-	:body (-> params query->longurl json-res) }))
+	:body (-> params query->longurl json-res) })
+  (route/resources "/") )
 
 (def app (handler/api route))
 
