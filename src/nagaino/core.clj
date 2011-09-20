@@ -13,7 +13,8 @@
 
 (defroutes route
   (GET "/api/v0/expand" [:as params]
-       (-> params query->longurl json-res) ))
+       {:headers {"Content-Type" "application/json; charset=utf-8"}
+	:body (-> params query->longurl json-res) }))
 
 (def app (handler/api route))
 
