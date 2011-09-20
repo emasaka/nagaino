@@ -10,12 +10,12 @@
   (-> params :query-params (get "shortUrl") expand-urls) )
 
 (defn json-res [seq]
-  (json-str {"status_code" 200 "data" {"expand" seq}}) )
+  {:headers {"Content-Type" "application/json; charset=utf-8"}
+   :body (json-str {"status_code" 200 "data" {"expand" seq}}) } )
 
 (defroutes route
   (GET "/api/v0/expand" [:as params]
-       {:headers {"Content-Type" "application/json; charset=utf-8"}
-	:body (-> params query->longurl json-res) })
+       (-> params query->longurl json-res) )
   (route/resources "/") )
 
 (def app (handler/api route))
