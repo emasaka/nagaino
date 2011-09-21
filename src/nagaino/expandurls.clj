@@ -45,7 +45,7 @@
 	loc (-> res :headers :location) ]
     (and loc (first loc)) ))
 
-(defn expand-bitly-urls-1 [sq]
+(defn expand-bitly-urls [sq]
   (let [url (str
 	     "http://api.bitly.com/v3/expand?format=json&login=" bitly-user
 	     "&apiKey=" bitly-key "&"
@@ -55,11 +55,6 @@
       (reduce (fn [r v] (assoc r (:short_url v) (:long_url v))) {}
 	      (-> (read-json (first (:body-seq res))) :data :expand) )
       {} )))
-
-(defn expand-bitly-urls [sq]
-  (reduce (fn [r v] (into r (expand-bitly-urls-1 v)))
-	  {}
-	  (partition-all 15 sq) ))
 
 ;;; main part
 
@@ -89,18 +84,18 @@
 	    (assoc-cons n-url :long_url_path newurl)
 	    (do-update-done n-url) )))
 
+(defn expand-bitly-n-urls-1 [sq]
+  (let [m (expand-bitly-urls (map #(-> % :long_url_path first) sq))]
+    (map (fn [n-url]
+	   (if-let [r (m (-> n-url :long_url_path first))]
+	     (assoc-cons n-url :long_url_path r)
+	     (assoc n-url :done? true :error "not found") ))
+	 sq )))
+
 (defn expand-bitly-n-urls [sq]
   (if (empty? sq)
     sq
-    (let [m (expand-bitly-urls (map #(-> % :long_url_path first) sq))]
-      (map (fn [n-url]
-	     (if-let [r (m (-> n-url :long_url_path first))]
-	       (assoc-cons n-url :long_url_path r)
-	       (assoc n-url :done? true :error "not found") ))
-	   sq ))))
-
-(defn deref-if-future [x]
-  (if (future? x) @x x) )
+    (->> sq (partition-all 15) (map #(future (expand-bitly-n-urls-1 %)))) ))
 
 (defn expand-nagaino-urls-1 [n-urls]
   (->> n-urls
@@ -110,9 +105,11 @@
 		         (assoc-cons r :bitlyurls v)
 		       :else (assoc-cons r :n-urls v) ))
 	       {:dones () :n-urls () :bitlyurls ()} )
-       (#(into (into (:dones %) (map expand-n-url-1 (:n-urls %)))
-	       (expand-bitly-n-urls (:bitlyurls %)) ))
-       (map #(-> % deref-if-future update-status)) ))
+       (#(into (:dones %)
+	       (map deref (into (map expand-n-url-1 (:n-urls %))
+				(expand-bitly-n-urls (:bitlyurls %)) ))))
+       flatten
+       (map update-status) ))
 
 (defn expand-nagaino-urls [n-urls]
   (let [r (expand-nagaino-urls-1 n-urls)]
