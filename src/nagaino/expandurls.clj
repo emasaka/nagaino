@@ -59,7 +59,7 @@
 (defn expand-bitly-urls [sq]
   (reduce (fn [r v] (into r (expand-bitly-urls-1 v)))
 	  {}
-	  (partition 15 sq) ))
+	  (partition-all 15 sq) ))
 
 ;;; main part
 
