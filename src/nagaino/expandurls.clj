@@ -31,8 +31,12 @@
 
 (defstruct NagainoUrl :short_url :long_url_path :done? :error :long_url)
 
-(defn string->NagainoUrl [#^String url]
+(defn string->nagaino-url [#^String url]
   (struct NagainoUrl url (list url) false nil nil) )
+
+(defn nagaino-url->map [n-url]
+  (let [m (dissoc (into {} n-url) :done?)]
+    (if (:error m) m (dissoc m :error)) ))
 
 ;;; HTTP access
 
@@ -112,6 +116,6 @@
 (defn expand-urls [sq]
   (->> sq
        distinct
-       (map #(-> % string->NagainoUrl update-done))
+       (map #(-> % string->nagaino-url update-done))
        expand-nagaino-urls
-       (map #(dissoc (into {} %) :done?)) ))
+       (map nagaino-url->map) ))
