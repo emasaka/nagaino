@@ -45,7 +45,7 @@
 	loc (-> res :headers :location) ]
     (and loc (first loc)) ))
 
-(defn expand-bitly-urls [sq]
+(defn expand-bitly-urls-1 [sq]
   (let [url (str
 	     "http://api.bitly.com/v3/expand?format=json&login=" bitly-user
 	     "&apiKey=" bitly-key "&"
@@ -55,6 +55,11 @@
       (reduce (fn [r v] (assoc r (:short_url v) (:long_url v))) {}
 	      (-> (read-json (first (:body-seq res))) :data :expand) )
       {} )))
+
+(defn expand-bitly-urls [sq]
+  (reduce (fn [r v] (into r (expand-bitly-urls-1 v)))
+	  {}
+	  (partition 15 sq) ))
 
 ;;; main part
 
