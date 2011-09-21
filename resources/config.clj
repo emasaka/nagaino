@@ -4,7 +4,7 @@
 		  "http://u.nu/" "http://twurl.nl/" "http://icio.us/"
 		  "http://htn.to/" "http://cot.ag/" "http://ht.ly/"
 		  "http://p.tl/" "http://url4.eu/" )
- :bitly-hosts ("http://bit.ly" "http://amzn.to/" "http://s.nikkei.com/"
+ :bitly-hosts ("http://bit.ly/" "http://amzn.to/" "http://s.nikkei.com/"
 	       "http://t.asahi.com/" "http://nyti.ms/" "http://tcrn.ch/"
 	       "http://huff.to/" "http://on.cnn.com/")
  }
