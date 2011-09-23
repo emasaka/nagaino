@@ -93,13 +93,13 @@
 
 (defn expand-bitly-n-urls-1 [sq]
   (let [[m err] (expand-bitly-urls (map #(-> % :long_url_path first) sq))]
-    (if err
-      (map #(assoc (do-update-done %) :error err) sq)
-      (map (fn [n-url]
+    (map (if err
+	   #(assoc (do-update-done %) :error err)
+	   (fn [n-url]
 	     (if-let [r (m (-> n-url :long_url_path first))]
 	       (assoc-cons n-url :long_url_path r)
-	       (assoc (do-update-done n-url) :error "Not Found") ))
-	   sq ))))
+	       (assoc (do-update-done n-url) :error "Not Found") )))
+	 sq )))
 
 (defn expand-bitly-n-urls [sq]
   (if (empty? sq)
