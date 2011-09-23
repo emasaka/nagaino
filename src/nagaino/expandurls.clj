@@ -42,8 +42,13 @@
 
 (defn url-location [#^String url]
   (let [res (binding [*follow-redirects* false] (request url "HEAD"))
-	loc (-> res :headers :location) ]
-    (and loc (first loc)) ))
+	code (:code res) ]
+    (cond (>= code 400) [nil code (:msg res)]
+	  (>= code 300) [(-> res :headers :location first) code nil]
+	  :else [nil code (:msg res)] )))
+
+(defn map-array->map [ary key-key val-key]
+  (reduce (fn [r v] (assoc r (v key-key) (v val-key))) {} ary) )
 
 (defn expand-bitly-urls [sq]
   (let [url (str
@@ -52,9 +57,9 @@
 	     (str-join "&" (map #(str "shortUrl=" (url-encode %)) sq)) )
 	res (request url) ]
     (if (= (:code res) 200)
-      (reduce (fn [r v] (assoc r (:short_url v) (:long_url v))) {}
-	      (-> (read-json (first (:body-seq res))) :data :expand) )
-      {} )))
+      [(-> res :body-seq first read-json :data :expand
+	   (#(map-array->map % :short_url :long_url)) ) nil]
+      [nil (:msg res)] )))
 
 ;;; main part
 
@@ -80,17 +85,21 @@
   (assoc mp key (cons val (mp key))) )
 
 (defn expand-n-url-1 [n-url]
-  (future (if-let [newurl (-> n-url :long_url_path first url-location)]
-	    (assoc-cons n-url :long_url_path newurl)
-	    (do-update-done n-url) )))
+  (future (let [[u code msg] (-> n-url :long_url_path first url-location)]
+	    (if u
+	      (assoc-cons n-url :long_url_path u)
+	      (let [r (do-update-done n-url)]
+		(if (>= code 400) r (assoc r :error msg)) )))))
 
 (defn expand-bitly-n-urls-1 [sq]
-  (let [m (expand-bitly-urls (map #(-> % :long_url_path first) sq))]
-    (map (fn [n-url]
-	   (if-let [r (m (-> n-url :long_url_path first))]
-	     (assoc-cons n-url :long_url_path r)
-	     (assoc n-url :done? true :error "not found") ))
-	 sq )))
+  (let [[m err] (expand-bitly-urls (map #(-> % :long_url_path first) sq))]
+    (if err
+      (map #(assoc (do-update-done %) :error err) sq)
+      (map (fn [n-url]
+	     (if-let [r (m (-> n-url :long_url_path first))]
+	       (assoc-cons n-url :long_url_path r)
+	       (assoc (do-update-done n-url) :error "Not Found") ))
+	   sq ))))
 
 (defn expand-bitly-n-urls [sq]
   (if (empty? sq)
