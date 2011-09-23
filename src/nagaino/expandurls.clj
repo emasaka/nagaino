@@ -114,7 +114,7 @@
 		         (assoc-cons r :bitlyurls v)
 		       :else (assoc-cons r :n-urls v) ))
 	       {:dones () :n-urls () :bitlyurls ()} )
-       (#(into (:dones %)
+       (#(list (:dones %)
 	       (map deref (into (map expand-n-url-1 (:n-urls %))
 				(expand-bitly-n-urls (:bitlyurls %)) ))))
        flatten
