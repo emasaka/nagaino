@@ -4,7 +4,8 @@
 	[clojure.contrib.io :only [with-in-reader]]
 	[clojure.java.io :only [resource]]
 	[clojure.contrib.json :only [read-json]]
-	[ring.util.codec :only [url-encode]] ))
+	[ring.util.codec :only [url-encode]]
+	[nagaino.cache :only [expand-from-cache update-cache]] ))
 
 ;;; config
 
@@ -29,13 +30,13 @@
 
 ;;; structure
 
-(defstruct NagainoUrl :short_url :long_url_path :done? :error :long_url)
+(defstruct NagainoUrl :short_url :long_url_path :long_url :done? :error :cached)
 
 (defn string->nagaino-url [#^String url]
-  (struct NagainoUrl url (list url) false nil nil) )
+  (struct NagainoUrl url (list url) nil false nil nil) )
 
 (defn nagaino-url->map [n-url]
-  (let [m (dissoc (into {} n-url) :done?)]
+  (let [m (dissoc (into {} n-url) :done? :cached)]
     (if (:error m) m (dissoc m :error)) ))
 
 ;;; HTTP access
@@ -108,6 +109,7 @@
 
 (defn expand-nagaino-urls-1 [n-urls]
   (->> n-urls
+       expand-from-cache
        (reduce (fn [r v]
 		 (cond (:done? v) (assoc-cons r :dones v)
 		       (re-find bitlyurl-regex (-> v :long_url_path first))
@@ -129,4 +131,5 @@
        distinct
        (map #(-> % string->nagaino-url update-done))
        expand-nagaino-urls
+       update-cache
        (map nagaino-url->map) ))
