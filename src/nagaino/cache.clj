@@ -65,11 +65,12 @@
 	 (lists-starts-before rev (or (:cached n-url) (last rev)) ()) )))
 
 (defn update-cache [sq]
-  (when mongo-url
-    (maybe-init)
-    (let [r (reduce (fn [r v]
-		      (if (or (:error v) (= (:cached v) (:short_url v)))
-			r
-			(into r (not-cached-list v)) )) () sq )]
-      (or (empty? r) (mass-insert! :nagainocache r)) ))
+  (future
+   (when mongo-url
+     (maybe-init)
+     (let [r (reduce (fn [r v]
+		       (if (or (:error v) (= (:cached v) (:short_url v)))
+			 r
+			 (into r (not-cached-list v)) )) () sq )]
+       (or (empty? r) (mass-insert! :nagainocache r)) )))
   sq )
