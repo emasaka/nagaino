@@ -33,26 +33,22 @@
 
 (defn update-from-cache [n-urls results]
   (map (fn [n-url]
-	 (let [u (-> n-url :long_url_path first)
-	       r (find-first #(= u (:short_url %)) results) ]
-	   (if r
+	 (let [u (-> n-url :long_url_path first)]
+	   (if-let [r (find-first #(= u (:short_url %)) results)]
 	     (assoc n-url
 	       :done? true
 	       :long_url_path (concat (:long_url_path r)
 				      (rest (:long_url_path n-url)) )
-	       :long_url (:long_url r)
-	       :cached (:sort_url r) )
+	       :long_url (:long_url r) :cached (:sort_url r) )
 	     n-url )))
        n-urls) )
 
 (defn expand-from-cache [sq]
   (if mongo-url
     (do (maybe-init)
-	(let [results (->> sq
-			   (map #(->> % :long_url_path first))
-			   (#(fetch :nagainocache
-				    :where {:short_url {:$in %}} )) )]
-	  (update-from-cache sq results) ))
+	(let [rs (->> sq (map #(->> % :long_url_path first))
+		      (#(fetch :nagainocache :where {:short_url {:$in %}} ))) ]
+	  (update-from-cache sq rs) ))
     sq ))
 
 ;;; insert
@@ -64,8 +60,7 @@
 
 (defn not-cached-list [n-url]
   (map #(array-map :long_url_path (reverse %)
-		   :short_url (first %)
-		   :long_url (:long_url n-url ))
+		   :short_url (first %) :long_url (:long_url n-url ))
        (let [rev (reverse (:long_url_path n-url))]
 	 (lists-starts-before rev (or (:cached n-url) (last rev)) ()) )))
 
