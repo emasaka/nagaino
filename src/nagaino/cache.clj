@@ -5,7 +5,7 @@
 
 ;;; config
 
-(def mongo-url (System/getenv "MONGO_URL"))
+(def mongo-url (System/getenv "MONGOHQ_URL"))
 
 ;;; copied from
 ;;; http://thecomputersarewinning.com/post/clojure-heroku-noir-mongo
