@@ -9,7 +9,7 @@
 	    [compojure.route :as route] ))
 
 (defn query->longurl [params]
-  (-> params :query-params (get "shortUrl") expand-urls) )
+  (-> params :query-params (get "q") expand-urls) )
 
 (defn json-res [seq]
   {:headers {"Content-Type" "application/json; charset=utf-8"}
