@@ -8,19 +8,30 @@
   (:require [compojure.handler :as handler]
 	    [compojure.route :as route] ))
 
-(defn query->longurl [params]
-  (-> params :query-params (get "q") expand-urls) )
+(defn transform-result [fmt urls]
+  (case fmt
+	"json_hash" (zipmap (map #(:short_url %) urls) urls)
+	"json_hash_simple" (zipmap (map #(:short_url %) urls)
+				   (map #(:long_url %) urls) )
+	urls ))
 
-(defn json-res [seq]
+(defn query->longurl [params]
+  (let [qp (:query-params params)]
+    (->> (qp "q") expand-urls (transform-result (qp "format"))) ))
+
+(defn text->longurl [params]
+  (->> params :shortUrls url-decode (re-split #"\n") expand-urls
+       (transform-result (:format params)) ))
+
+(defn res-json [seq]
   {:headers {"Content-Type" "application/json; charset=utf-8"}
    :body (json-str {"status_code" 200 "data" {"expand" seq}}) } )
 
 (defroutes route
   (GET "/api/v0/expand" [:as params]
-       (-> params query->longurl json-res) )
+       (-> params query->longurl res-json) )
   (POST "/api/v0/expandText" {params :params}
-	(->> params :shortUrls url-decode (re-split #"\n") expand-urls
-	     json-res ))
+	(-> params text->longurl res-json) )
   (route/resources "/") )
 
 (def app (handler/api route))
