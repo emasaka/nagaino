@@ -61,13 +61,17 @@
        (let [rev (reverse (:long_url_path n-url))]
 	 (lists-starts-before rev (or (:cached n-url) (last rev)) ()) )))
 
+(defn gather-caching-urls [sq]
+  (reduce (fn [r v]
+	    (if (or (:error v) (= (:cached v) (:short_url v)))
+	      r
+	      (into r (not-cached-list v)) ))
+	  () sq ))
+
 (defn update-cache [sq]
-  (future
-   (when mongo-url
+  (when mongo-url
+    (future
      (maybe-init)
-     (let [r (reduce (fn [r v]
-		       (if (or (:error v) (= (:cached v) (:short_url v)))
-			 r
-			 (into r (not-cached-list v)) )) () sq )]
+     (let [r (gather-caching-urls sq)]
        (or (empty? r) (mass-insert! :nagainocache r)) )))
   sq )
