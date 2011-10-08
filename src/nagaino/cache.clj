@@ -12,12 +12,9 @@
 ;;; and modified
 
 (defn split-mongo-url [url]
-  (let [matcher (re-matcher #"^.*://(.*?):(.*?)@(.*?):(\d+)/(.*)$" url)]
-    (if (.find matcher)
-      (zipmap [:match :user :pass :host :port :db] (re-groups matcher))
-      (let [matcher (re-matcher #"^.*://(.*?):(\d+)/(.*)$" url)]
-	(when (.find matcher)
-	  (zipmap [:match :host :port :db] (re-groups matcher)) )))))
+  (let [matcher (re-matcher #"^.*://(?:(.*?):(.*?)@)?(.*?):(\d+)/(.*)$" url)]
+    (when (.find matcher)
+      (zipmap [:match :user :pass :host :port :db] (re-groups matcher)) )))
 
 (defn maybe-init []
   (when (not (connection? *mongo-config*))
