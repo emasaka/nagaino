@@ -49,7 +49,7 @@
 	  :else [nil code (:msg res)] )))
 
 (defn map-array->map [ary key-key val-key]
-  (reduce (fn [r v] (assoc r (v key-key) (v val-key))) {} ary) )
+  (zipmap (map #(% key-key) ary) (map #(% val-key) ary)) )
 
 (defn expand-bitly-urls [sq]
   (let [url (str
