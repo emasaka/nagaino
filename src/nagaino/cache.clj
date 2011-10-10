@@ -63,7 +63,8 @@
 
 (defn gather-caching-urls [sq]
   (reduce (fn [r v]
-	    (if (or (:error v) (= (:cached v) (:short_url v)))
+	    (if (or (:error v) (= (:cached v) (:short_url v))
+		    (-> v :long_url_path rest empty?) )
 	      r
 	      (into r (not-cached-list v)) ))
 	  () sq ))
