@@ -36,7 +36,7 @@
 	       :done? true
 	       :long_url_path (concat (:long_url_path r)
 				      (rest (:long_url_path n-url)) )
-	       :long_url (:long_url r) :cached (:sort_url r) )
+	       :long_url (:long_url r) :cached (:short_url r) )
 	     n-url )))
        n-urls) )
 
