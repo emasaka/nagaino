@@ -108,13 +108,11 @@
 (defn expand-nagaino-urls-1 [n-urls]
   (->> n-urls
        expand-from-cache
-       (reduce (fn [r v]
-		 (cond (:done? v) (assoc-cons r :dones v)
-		       (re-find bitlyurl-regex (-> v :long_url_path first))
-		         (assoc-cons r :bitlyurls v)
-		       :else (assoc-cons r :n-urls v) ))
-	       {:dones () :n-urls () :bitlyurls ()} )
-       (#(list (:dones %)
+       (group-by
+	#(cond (:done? %) :dones
+	       (re-find bitlyurl-regex (-> % :long_url_path first)) :bitlyurls
+	       :else :n-urls ))
+       (#(list (or (:dones %) ())
 	       (map deref (into (map expand-n-url-1 (:n-urls %))
 				(expand-bitly-n-urls (:bitlyurls %)) ))))
        flatten
