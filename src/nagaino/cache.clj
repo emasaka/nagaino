@@ -17,11 +17,11 @@
       (zipmap [:match :user :pass :host :port :db] (re-groups matcher)) )))
 
 (defn maybe-init []
-  (when (not (connection? *mongo-config*))
+  (when-not (connection? *mongo-config*)
     (let [config (split-mongo-url mongo-url)]
       (mongo! :db (:db config) :host (:host config)
 	      :port (Integer. (:port config)) )
-      (if-let [user (:user config)]
+      (when-let [user (:user config)]
 	(authenticate user (:pass config)) ))))
 
 ;;; my codes
