@@ -103,9 +103,7 @@
 	 sq )))
 
 (defn expand-bitly-n-urls [sq]
-  (if (empty? sq)
-    sq
-    (->> sq (partition-all 15) (map #(future (expand-bitly-n-urls-1 %)))) ))
+  (->> sq (partition-all 15) (map #(future (expand-bitly-n-urls-1 %)))) )
 
 (defn expand-nagaino-urls-1 [n-urls]
   (->> n-urls
