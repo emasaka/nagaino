@@ -11,8 +11,8 @@
 (defn transform-result [fmt urls]
   (case fmt
 	"json_hash" (zipmap (map #(:short_url %) urls) urls)
-	"json_hash_simple" (zipmap (map #(:short_url %) urls)
-				   (map #(:long_url %) urls) )
+	"json_simple" (zipmap (map #(:short_url %) urls)
+			      (map #(:long_url %) urls) )
 	urls ))
 
 (defn query->longurl [params]
