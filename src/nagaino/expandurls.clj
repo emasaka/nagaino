@@ -114,8 +114,8 @@
 	       :else :n-urls ))
        (#(list (or (:dones %) ())
 	       (map deref
-		    (into (doall (map expand-n-url-1 (:n-urls %)))
-			  (doall (expand-bitly-n-urls (:bitlyurls %))) ))))
+		    (concat (doall (map expand-n-url-1 (:n-urls %)))
+			    (doall (expand-bitly-n-urls (:bitlyurls %))) ))))
        flatten
        (map update-status) ))
 
