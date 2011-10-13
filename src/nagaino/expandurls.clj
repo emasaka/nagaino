@@ -105,8 +105,19 @@
 (defn expand-bitly-n-urls [sq]
   (->> sq (partition-all 15) (map #(future (expand-bitly-n-urls-1 %)))) )
 
-(defn expand-nagaino-urls-1 [n-urls]
+(defn expand-from-table [n-url table]
+  (if-let [r (table (-> n-url :long_url_path first))]
+    (recur (assoc-cons n-url :long_url_path r) table)
+    n-url ))
+
+(defn update-table [table sq]
+  (reduce (fn [r v] (conj r [(second v) (first v)]))
+	  table (map #(take 2 (:long_url_path %))
+		     (filter #(not (:done? %)) sq) )))
+
+(defn expand-nagaino-urls-1 [n-urls table]
   (->> n-urls
+       (map #(expand-from-table % table))
        expand-from-cache
        (group-by
 	#(cond (:done? %) :dones
@@ -117,11 +128,14 @@
 		    (concat (doall (map expand-n-url-1 (:n-urls %)))
 			    (doall (expand-bitly-n-urls (:bitlyurls %))) ))))
        flatten
-       (map update-status) ))
+       (#(vector (map update-status %) (update-table table %))) ))
+
+(defn expand-nagaino-urls-with-table [n-urls table]
+  (let [[r tbl] (expand-nagaino-urls-1 n-urls table)]
+    (if (every? :done? r) r (recur r tbl)) ))
 
 (defn expand-nagaino-urls [n-urls]
-  (let [r (expand-nagaino-urls-1 n-urls)]
-    (if (every? :done? r) r (recur r)) ))
+  (expand-nagaino-urls-with-table n-urls {}) )
 
 (defn expand-urls [sq]
   (->> sq
