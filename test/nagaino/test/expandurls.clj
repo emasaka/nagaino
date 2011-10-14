@@ -37,32 +37,32 @@
 (deftest test-do-update-done
   (let [long-url "http://example.jp/"
 	n-url (string->nagaino-url "http://example.com/")
-	n-url-1 (assoc-cons n-url :long_url_path long-url)
+	n-url-1 (add-url n-url long-url)
 	n-url-done (do-update-done n-url-1) ]
     (is (contains? n-url-done :done?))
     (is (= (:long_url n-url-done) long-url)) ))
 
 (deftest test-update-done
   (let [n-url-1 (string->nagaino-url "http://t.co/")
-	n-url-2 (assoc-cons n-url-1 :long_url_path "http://example.com/") ]
+	n-url-2 (add-url n-url-1 "http://example.com/") ]
     (is (-> n-url-1 update-done :done? not))
     (is (-> n-url-2 update-done :done?)) ))
 
 (deftest test-update-looped
   (let [url "http://example.com/"
-	n-url-1 (assoc-cons (string->nagaino-url url) :long_url_path url)
+	n-url-1 (add-url (string->nagaino-url url) url)
 	n-url-2 (update-looped n-url-1) ]
     (is (contains? n-url-2 :done?))
     (is (:error n-url-2))
     (is (= (rest (:long_url n-url-2)) ())) ))
 
-(deftest test-assoc-cons
-  (let [lst '(a b)
-	m {:lst lst}
-	item 'aa
-	m2 (assoc-cons m :lst item) ]
-    (is (= (first (:lst m2)) item))
-    (is (= (rest (:lst m2)) lst)) ))
+(deftest test-add-url
+  (let [lst '("http://example.com/1")
+	m {:long_url_path lst}
+	item "http://example.com/2"
+	m2 (add-url m item) ]
+    (is (= (first (:long_url_path m2)) item))
+    (is (= (rest (:long_url_path m2)) lst)) ))
 
 (deftest test-expand-from-table
   (let [table {"http://example.com/1" "http://example.com/2"

@@ -82,13 +82,13 @@
 (defn update-status [n-url]
   (if (:done? n-url) n-url (-> n-url update-looped update-done)) )
 
-(defn assoc-cons [mp key val]
-  (assoc mp key (cons val (mp key))) )
+(defn add-url [n-url url]
+  (assoc n-url :long_url_path (cons url (:long_url_path n-url))) )
 
 (defn expand-n-url-1 [n-url]
   (future (let [[u code msg] (-> n-url :long_url_path first url-location)]
 	    (if u
-	      (assoc-cons n-url :long_url_path u)
+	      (add-url n-url u)
 	      (let [r (do-update-done n-url)]
 		(if (>= code 400) r (assoc r :error msg)) )))))
 
@@ -98,7 +98,7 @@
 	   #(assoc (do-update-done %) :error err)
 	   (fn [n-url]
 	     (if-let [r (m (-> n-url :long_url_path first))]
-	       (assoc-cons n-url :long_url_path r)
+	       (add-url n-url r)
 	       (assoc (do-update-done n-url) :error "Not Found") )))
 	 sq )))
 
@@ -107,7 +107,7 @@
 
 (defn expand-from-table [n-url table]
   (if-let [r (table (-> n-url :long_url_path first))]
-    (recur (assoc-cons n-url :long_url_path r) table)
+    (recur (add-url n-url r) table)
     n-url ))
 
 (defn update-table [table sq]
