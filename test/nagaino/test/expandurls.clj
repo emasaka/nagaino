@@ -29,11 +29,6 @@
       (is (not (contains? n-url-2-map :done)))
       (is (contains? n-url-2-map :error)) )))
 
-(deftest test-map-array->map
-  (is (= (map-array->map [{:k :a, :v 10} {:k :b, :v 20} {:k :c, :v 30}]
-			 :k :v )
-	 {:a 10, :b 20, :c, 30} )))
-
 (deftest test-do-update-done
   (let [long-url "http://example.jp/"
 	n-url (string->nagaino-url "http://example.com/")
@@ -65,24 +60,27 @@
     (is (= (rest (:long_url_path m2)) lst)) ))
 
 (deftest test-expand-from-table
-  (let [table {"http://example.com/1" "http://example.com/2"
-	       "http://example.com/2" "http://example.com/3"
-	       "http://example.com/11" "http://example.com/12" }
+  (let [table {"http://example.com/1" (struct Expm "http://example.com/1"
+					      "http://example.com/2" )
+	       "http://example.com/2" (struct Expm "http://example.com/2"
+					      "http://example.com/3" )
+	       "http://example.com/11" (struct Expm "http://example.com/11"
+					       "http://example.com/12" )
+	       "http://example.com/21" nil
+	       "http://example.com/31" (struct Expm "http://example.com/31"
+					       nil "Not Found" )}
 	n1 {:long_url_path '("http://example.com/1")}
-	n2 {:long_url_path '("http://example.com/11")} ]
-    (is (= (:long_url_path (expand-from-table n1 table))
+	n2 {:long_url_path '("http://example.com/11")}
+	n3 {:long_url_path '("http://example.com/21")}
+	n4 {:long_url_path '("http://example.com/31")} ]
+    (is (= (:long_url_path (expand-from-table table n1))
 	   '("http://example.com/3" "http://example.com/2"
 	     "http://example.com/1" )))
-    (is (= (:long_url_path (expand-from-table n2 table))
-	   '("http://example.com/12" "http://example.com/11") )) ))
-
-(deftest test-update-table
-  (let [table {"http://example.com/1" "http://example.com/2"}
-	sq [{:long_url_path '("http://example.com/3" "http://example.com/1")}
-	    {:long_url_path '("http://example.com/12" "http://example.com/11")}
-	    {:long_url_path '("http://example.com/22" "http://example.com/21")
-	     :done? true }]
-	table2 (update-table table sq) ]
-    (is (= (table2 "http://example.com/1") "http://example.com/3"))
-    (is (= (table2 "http://example.com/11") "http://example.com/12"))
-    (is (nil? (table2 "http://example.com/21"))) ))
+    (is (= (:long_url_path (expand-from-table table n2))
+	   '("http://example.com/12" "http://example.com/11") ))
+    (let [r (expand-from-table table n3)]
+      (is r n3 ))
+    (let [r (expand-from-table table n4)]
+      (is (= (:long_url_path r) '("http://example.com/31")))
+      (is (:done? r))
+      (is (:error r)) ) ))
