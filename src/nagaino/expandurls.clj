@@ -34,7 +34,7 @@
 
 (defstruct NagainoUrl :short_url :long_url_path :long_url :done? :error :cached)
 
-(defn string->nagaino-url [#^String url]
+(defn string->nagaino-url [^String url]
   (struct NagainoUrl url (list url) nil false nil nil) )
 
 (defn nagaino-url->map [n-url]
@@ -45,14 +45,14 @@
 
 ;;; HTTP access
 
-(defn url-location [#^String url]
+(defn url-location [^String url]
   (let [res (binding [*follow-redirects* false] (request url "HEAD"))
 	code (:code res) ]
     (cond (>= code 400) [nil (:msg res)]
 	  (>= code 300) [(-> res :headers :location first) nil]
 	  :else [nil (:msg res)] )))
 
-(defn url->expm [#^String url]
+(defn url->expm [^String url]
   (let [[u msg] (url-location url)] (struct Expm url u msg)) )
 
 (defn bitly-query-url [sq]
