@@ -32,7 +32,7 @@
        (-> params query->longurl res-json) )
   (POST "/api/v0/expandText" {params :params}
 	(-> params text->longurl res-json) )
-  (route/resources "/") )
+  (route/files "/" {:root "./resources/public"}) )
 
 (def app (handler/api route))
 
