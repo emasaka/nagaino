@@ -118,14 +118,14 @@
 
 ;;; main part
 
-(defn expand-nagaino-urls-1 [n-urls table]
+(defn expand-nagaino-urls-1 [table n-urls]
   (let [n-urls-2 (expand-from-cache n-urls)
 	table2 (update-table table n-urls-2) ]
-    [(map #(->> % (expand-from-table table2) update-status) n-urls-2)
-     table2 ] ))
+    [table2
+     (map #(->> % (expand-from-table table2) update-status) n-urls-2) ] ))
 
 (defn expand-nagaino-urls [table n-urls]
-  (let [[r table2] (expand-nagaino-urls-1 n-urls table)]
+  (let [[table2 r] (expand-nagaino-urls-1 table n-urls)]
     (if (every? :done? r) r (recur table2 r)) ))
 
 (defn expand-urls [sq]
