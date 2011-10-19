@@ -1,0 +1,13 @@
+table.result_item {
+    margin: 2px;
+    border: 1px #000000 solid;
+}
+
+table.result_item td {
+    border: 1px #000000 solid;
+}
+
+table.result_item td.title {
+    font-weitht: bold;
+    background-color: #ccccff;
+}

@@ -4,7 +4,8 @@
 	[ring.util.codec :only [url-decode]]
 	[clojure.contrib.json :only [json-str]]
 	[clojure.contrib.str-utils :only [re-split]]
-	[nagaino.expandurls :only [expand-urls]] )
+	[nagaino.expandurls :only [expand-urls]]
+	[nagaino.view :only [format-html]] )
   (:require [compojure.handler :as handler]
 	    [compojure.route :as route] ))
 
@@ -16,22 +17,39 @@
 	urls ))
 
 (defn query->longurl [params]
-  (let [qp (:query-params params)]
-    (->> (qp "q") expand-urls (transform-result (qp "format"))) ))
+  (->> (params "q") expand-urls ) )
 
 (defn text->longurl [params]
-  (->> params :shortUrls url-decode (re-split #"\n") expand-urls
-       (transform-result (:format params)) ))
+  (->> params :shortUrls url-decode (re-split #"\n") expand-urls) )
 
 (defn res-json [seq]
   {:headers {"Content-Type" "application/json; charset=utf-8"}
    :body (json-str {"status_code" 200 "data" {"expand" seq}}) } )
 
+(defn res-html [seq]
+  {:headers {"Content-Type" "text/html; charset=utf-8"}
+   :body (format-html seq) } )
+
+(defn res [fmt seq]
+  ((if (= fmt "html") res-html res-json) seq) )
+
+(defn api-expand [params]
+  (->> params
+       query->longurl
+       (transform-result (params "format"))
+       (res (:format params)) ))
+
+(defn api-expand-text [params]
+  (->> params
+       text->longurl
+       (transform-result (:format params))
+       (res (:format params)) ))
+
 (defroutes route
   (GET "/api/v0/expand" [:as params]
-       (-> params query->longurl res-json) )
+       (api-expand (:query-params params)) )
   (POST "/api/v0/expandText" {params :params}
-	(-> params text->longurl res-json) )
+	(api-expand-text params) )
   (route/files "/" {:root "./resources/public"}) )
 
 (def app (handler/api route))
