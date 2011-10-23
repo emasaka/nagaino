@@ -37,7 +37,7 @@
   (->> params
        query->longurl
        (transform-result (params "format"))
-       (res (:format params)) ))
+       (res (params "format")) ))
 
 (defn api-expand-text [params]
   (->> params
