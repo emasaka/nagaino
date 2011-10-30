@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>nagaino API documentation</title>
+</head>
+<body>
+<h1>nagaino API documentation</h1>
+<h2>expansion</h2>
+<h3 id="api_v0_expand">/api/v0/expand (GET)</h3>
+You can call this method to expand multiple shortened URLs recursively.
+Note that the length of request URL is limited.
+<h4>Parameters</h4>
+<dl>
+<dt>q</dt>
+<dd>one or more shortened URLs</dd>
+<dt>format</dt>
+<dd>one of the following:<ul>
+<li><strong>json_simple: </strong>JSON hash, which keys are shortened URLs, and values are expaned URLs</li>
+<li><strong>json: </strong>JSON hash, which keys are shrtened URLs, and values are full information</li>
+<li><strong>json_array: </strong>JSON array of full information</li>
+<li><strong>html: </strong>HTML</li>
+</ul></dd>
+</dl>
+<h3 id="api_v0_expandtext">/api/v0/expandText (POST)</h3>
+You can call this method to expand multiple shortened URLs recursively.
+<h4>Parameters</h4>
+<dl>
+<dt>shortURLs</dt>
+<dd>text data which each line is short URL.</dd>
+<dt>format</dt>
+<dd>one of the following:<ul>
+<li><strong>json_simple: </strong>JSON hash, which keys are shortened URLs, and values are expaned URLs</li>
+<li><strong>json: </strong>JSON hash, which keys are shrtened URLs, and values are full information</li>
+<li><strong>json_array: </strong>JSON array of full information</li>
+<li><strong>html: </strong>HTML</li>
+</ul></dd>
+</dl>
+</body>
+</html>
