@@ -1,6 +1,6 @@
 # nagaino
 
-Web API server which expands multi shortened URLs recursively.
+Web API server which expands multiple shortened URLs recursively.
 
 ## Usage
 
