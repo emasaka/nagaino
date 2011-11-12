@@ -5,24 +5,23 @@
 	[clojure.contrib.str-utils :only [str-join]] ))
 
 (defn format-html-data [sq]
-  [:div
-   (map (fn [item]
-	  [:div
-	   [:table.result_item
-	    [:tr
-	     [:td.title "short_url"]
-	     [:td.data (escape-html (:short_url item))] ]
-	    [:tr
-	     [:td.title "long_url"]
-	     [:td.data (escape-html (:long_url item))] ]
-	    [:tr
-	     [:td.title "long_url_path"]
-	     [:td.data (escape-html (str-join " ← " (:long_url_path item)))] ]
-	    (when (:error item)
-	      [:tr
-	       [:td.title "error"]
-	       [:td.data (escape-html (:error item))] ] ) ]])
-	sq )])
+  (map (fn [item]
+	 [:div
+	  [:table.result_item
+	   [:tr
+	    [:td.title "short_url"]
+	    [:td.data (escape-html (:short_url item))] ]
+	   [:tr
+	    [:td.title "long_url"]
+	    [:td.data (escape-html (:long_url item))] ]
+	   [:tr
+	    [:td.title "long_url_path"]
+	    [:td.data (escape-html (str-join " ← " (:long_url_path item)))] ]
+	   (when (:error item)
+	     [:tr
+	      [:td.title "error"]
+	      [:td.data (escape-html (:error item))] ] ) ]])
+       sq ))
 
 (defn format-html [sq]
   (html5
@@ -30,5 +29,7 @@
     [:title "result"]
     (include-css "/css/nagaino.css") ]
    [:body
-    [:h1 "result"]
-    (format-html-data sq) ]))
+    [:header [:h1 "nagaino"]]
+    [:article
+     [:h2 "result"]
+     (format-html-data sq) ]]))
