@@ -17,15 +17,14 @@
 	urls ))
 
 (defn query->longurl [params]
-  (let [urls (params "q")]
-    (if urls
-      (expand-urls urls) )))
+  (if-let [urls (params "q")]
+    (expand-urls urls)
+    () ))
 
 (defn text->longurl [params]
-  (let [urls (:shortUrls params)]
-    (if urls
-      (->> urls url-decode (re-split #"\n") expand-urls)
-      () )))
+  (if-let [urls (:shortUrls params)]
+    (->> urls url-decode (re-split #"\n") expand-urls)
+    () ))
 
 (defn res-json [seq]
   {:headers {"Content-Type" "application/json; charset=utf-8"}
