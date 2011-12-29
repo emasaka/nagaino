@@ -27,7 +27,8 @@
     () ))
 
 (defn res-json [seq]
-  {:headers {"Content-Type" "application/json; charset=utf-8"}
+  {:headers {"Content-Type" "application/json; charset=utf-8"
+             "Access-Control-Allow-Origin" "*" }
    :body (json-str {"status_code" 200 "data" {"expand" seq}}) } )
 
 (defn res-html [seq]
