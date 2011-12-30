@@ -1,15 +1,20 @@
 (ns nagaino.expandurls
   (:use [clojure-http.client :only [request *follow-redirects*]]
 	[clojure.contrib.str-utils :only [str-join]]
-	[clojure.contrib.io :only [with-in-reader]]
 	[clojure.java.io :only [resource]]
 	[clojure.contrib.json :only [read-json]]
 	[ring.util.codec :only [url-encode]]
-	[nagaino.cache :only [expand-from-cache update-cache]] ))
+	[nagaino.cache :only [expand-from-cache update-cache]] )
+  (:import [java.io InputStreamReader PushbackReader]) )
 
 ;;; config
 
-(def config (with-in-reader (resource "config.clj") (read)) )
+(defn read-from-resource-file [file]
+  (with-open [strm (-> file resource .openStream
+                       InputStreamReader. PushbackReader. )]
+    (read strm) ))
+
+(def config (read-from-resource-file "config.clj"))
 
 (defn seq->prefix-search-regex [sq]
   (re-pattern

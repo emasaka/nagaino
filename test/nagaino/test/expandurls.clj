@@ -4,6 +4,9 @@
 
 ;;; tests for nagaino.expandurls
 
+(deftest test-read-from-resource-file
+  (is (map? (read-from-resource-file "config.clj"))) )
+
 (deftest test-seq->prefix-search-regex
   (let [re (seq->prefix-search-regex ["aa" "bb" ".*"])]
     (is (re-find re "aaa"))
