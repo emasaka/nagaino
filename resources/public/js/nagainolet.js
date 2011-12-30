@@ -45,7 +45,7 @@
         }
     }
 
-    function call_nagaio(urls) {
+    function call_nagaino(urls) {
         var xhr = window.XDomainRequest ? new XDomainRequest() :
                                           new XMLHttpRequest() ;
         xhr.open('POST', 'http://nagaino.herokuapp.com/api/v0/expandText');
@@ -70,7 +70,7 @@
     function expand_urls() {
         var urls = gather_urls();
         if (urls.length > 0) {
-            call_nagaio(urls);
+            call_nagaino(urls);
         }
     }
 
