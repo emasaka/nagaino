@@ -46,24 +46,28 @@
     }
 
     function call_nagaino(urls) {
-        var xhr = window.XDomainRequest ? new XDomainRequest() :
-                                          new XMLHttpRequest() ;
-        xhr.open('POST', 'http://nagaino.herokuapp.com/api/v0/expandText');
-        if (xhr.setRequestHeader) {
+        var endpoint = 'http://nagaino.herokuapp.com/api/v0/expandText';
+        var xhr;
+        function cbfunc() {
+            var rtn = JSON.parse(xhr.responseText);
+            replace_urls(rtn['data']['expand']);
+        }
+        if (window.XDomainRequest) {
+            // XXX: for IE, but this doesn't work by lack of Content-Type
+            xhr = new XDomainRequest();
+            xhr.open('POST', endpoint);
+            xhr.onload = cbfunc;
+        } else {
+            xhr = new XMLHttpRequest();
+            xhr.open('POST', endpoint);
             xhr.setRequestHeader('Content-Type',
                                  'application/x-www-form-urlencoded' );
-        } else {
-            // XXX: for IE, but this doesn't work
-            xhr.contentType = 'application/x-www-form-urlencoded';
+            xhr.onreadystatechange = function() {
+                if ((xhr.readyState === 4) && (xhr.status == 200)) {
+                    cbfunc();
+                }
+            };
         }
-        xhr.onreadystatechange = function() {
-            var txt;
-            if ((xhr.readyState === 4) && (xhr.status == 200) &&
-                (txt = xhr.responseText) ) {
-                var rtn = JSON.parse(txt);
-                replace_urls(rtn['data']['expand']);
-            }
-        };
         xhr.send('format=json_simple&shortUrls=' + encodeURI(urls.join("\n")));
     }
 
