@@ -1,4 +1,4 @@
-{:shorturl-hosts ("http://t.co/" "http://tinyurl.com/" "http://is.gd/"
+{:shorturl-hosts ("http://t.co/" "https://t.co/" "http://tinyurl.com/" "http://is.gd/"
 		  "http://ff.im/" "http://j.mp/" "http://goo.gl/"
 		  "http://tr.im/" "http://short.to/" "http://ow.ly/"
 		  "http://u.nu/" "http://twurl.nl/" "http://icio.us/"
