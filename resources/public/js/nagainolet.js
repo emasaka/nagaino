@@ -25,11 +25,12 @@
 
     function replace_element_url(elm, oldurl, newurl) {
         var txt = elm.innerHTML;
-        var eu;
+        var txt2, eu;
         elm.href = newurl;
         if ((txt == oldurl) ||
+            ((txt2 = 'http://' + txt) == oldurl) ||
             ((eu = elm.getAttribute('data-expanded-url')) &&
-             (('http://' + txt) ==  eu) )) {
+             (txt2 ==  eu) )) {
             elm.innerHTML = newurl;
         }
     }
