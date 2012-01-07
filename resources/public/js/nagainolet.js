@@ -10,16 +10,21 @@
         return ary;
     }
 
+    function tag_each(tag, callback) {
+        var elms = document.getElementsByTagName(tag);
+        for (var i = 0, len = elms.length; i < len; i++) {
+            callback.apply(elms[i]);
+        }
+    }
+
     function gather_urls() {
         var urls_h = {};
-        var u;
-        var elms = document.getElementsByTagName('a');
-        for (var i = 0, len = elms.length; i < len; i++) {
-            var elm = elms[i];
-            if (elm && (u = elm.href) && url_re.test(u)) {
+        tag_each('a', function() {
+            var u;
+            if ((u = this.href) && url_re.test(u)) {
                 urls_h[u] = true;
             }
-        }
+        });
         return hash_keys(urls_h);
     }
 
@@ -36,14 +41,12 @@
     }
 
     function replace_urls(urls_hash) {
-        var elm, u, u2;
-        var elms = document.getElementsByTagName('a');
-        for (var i = 0, len = elms.length; i < len; i++) {
-            var elm = elms[i];
-            if (elm && (u = elm.href) && (u2 = urls_hash[u])) {
-                replace_element_url(elm, u, u2);
+        tag_each('a', function() {
+            var u, u2;
+            if ((u = this.href) && (u2 = urls_hash[u])) {
+                replace_element_url(this, u, u2);
             }
-        }
+        });
     }
 
     function call_nagaino(urls) {
