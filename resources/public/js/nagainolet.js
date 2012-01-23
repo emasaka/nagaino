@@ -1,6 +1,7 @@
 (function() {
 
     var url_re = new RegExp('^(?:http://t\.co/|https://t\.co/|http://tinyurl\.com/|http://is\.gd/|http://wp\.mep/|http://ff\.im/|http://j\.mp/|http://goo\.gl/|http://tr\.im/|http://short\.to/|http://ow\.ly/|http://u\.nu/|http://twurl\.nl/|http://icio\.us/|http://htn\.to/|http://cot\.ag/|http://ht\.ly/|http://p\.tl/|http://url4\.eu/|http://ur1\.ca/|http://sgp\.cm/|http://dlvr\.it/|http://me\.lt|http://bit\.ly/|http://amzn\.to/|http://s\.nikkei\.com/|http://t\.asahi\.com/|http://nyti\.ms/|http://tcrn\.ch/|http://huff\.to/|http://on\.cnn\.com/|http://e8\.biz/)');
+    var ng_url_re = new RegExp('^http://t\.co/.*[()]$');
 
     function hash_keys(h) {
         var ary = [];
@@ -21,7 +22,7 @@
         var urls_h = {};
         tag_each('a', function() {
             var u;
-            if ((u = this.href) && url_re.test(u)) {
+            if ((u = this.href) && url_re.test(u) && ! ng_url_re.test(u)) {
                 urls_h[u] = true;
             }
         });
