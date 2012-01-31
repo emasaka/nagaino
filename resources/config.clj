@@ -9,5 +9,5 @@
  :bitly-hosts ("http://bit.ly/" "http://amzn.to/" "http://s.nikkei.com/"
 	       "http://t.asahi.com/" "http://nyti.ms/" "http://tcrn.ch/"
 	       "http://huff.to/" "http://on.cnn.com/" "http://e8.biz/"
-	       "http://reut.rs/" )
+	       "http://reut.rs/" "http://nkbp.jp/" )
  }
