@@ -1,10 +1,10 @@
 (ns nagaino.expandurls
-  (:use [clojure-http.client :only [request *follow-redirects*]]
-	[clojure.contrib.str-utils :only [str-join]]
+  (:use [clojure.contrib.str-utils :only [str-join]]
 	[clojure.java.io :only [resource]]
 	[clojure.contrib.json :only [read-json]]
 	[ring.util.codec :only [url-encode]]
 	[nagaino.cache :only [expand-from-cache update-cache]] )
+  (:require [clj-http.client :as client])
   (:import [java.io InputStreamReader PushbackReader]) )
 
 ;;; config
@@ -51,11 +51,10 @@
 ;;; HTTP access
 
 (defn url-location [^String url]
-  (let [res (binding [*follow-redirects* false] (request url "HEAD"))
-	code (:code res) ]
-    (cond (>= code 400) [nil (:msg res)]
-	  (>= code 300) [(-> res :headers :location first) nil]
-	  :else [nil (:msg res)] )))
+  (let [res (client/head url {:follow-redirects false})
+	code (:status res) ]
+    (cond (and (>= code 300) (< code 400)) [((res :headers) "location") nil]
+	  :else [nil code] )))
 
 (defn url->expm [^String url]
   (let [[u msg] (url-location url)] (struct Expm url u msg)) )
@@ -66,9 +65,9 @@
        (str-join "&" (map #(str "shortUrl=" (url-encode %)) sq)) ))
 
 (defn bitly-urls->expms [sq]
-  (let [res (-> sq bitly-query-url request) ]
-    (if (= (:code res) 200)
-      (-> res :body-seq first read-json :data :expand)
+  (let [res (-> sq bitly-query-url client/get) ]
+    (if (= (:status res) 200)
+      (-> res :body read-json :data :expand)
       (map #(struct Expm (:short_url %) nil (:msg res)) sq) )))
 
 (defn urls->expm-seq [sq]
