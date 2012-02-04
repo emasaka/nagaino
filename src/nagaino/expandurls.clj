@@ -50,11 +50,12 @@
 
 ;;; HTTP access
 
+(defn parse-location-res [res]
+  (let [code (:status res)]
+    (if (<= 301 code 307) [((res :headers) "location") nil] [nil code]) ))
+
 (defn url-location [^String url]
-  (let [res (client/head url {:follow-redirects false})
-	code (:status res) ]
-    (cond (and (>= code 300) (< code 400)) [((res :headers) "location") nil]
-	  :else [nil code] )))
+  (parse-location-res (client/head url {:follow-redirects false})) )
 
 (defn url->expm [^String url]
   (let [[u msg] (url-location url)] (struct Expm url u msg)) )
@@ -65,18 +66,20 @@
        (join "&" (map #(str "shortUrl=" (url-encode %)) sq)) ))
 
 (defn keywordize [m]
-  (reduce (fn [r v] (let [k (v 0)]
-                      (conj r {(if (string? k) (keyword k) k) (v 1)}) ))
+  (reduce (fn [r v]
+            (let [k (v 0)] (conj r {(if (string? k) (keyword k) k) (v 1)})) )
           {} m ))
 
+(defn parse-bitly-res [res sq]
+  (if (= (:status res) 200)
+    (let [dat (-> res :body json/parse-string)]
+      (if (= (dat "status_code") 200)
+        (map keywordize ((dat "data") "expand"))
+        (map #(struct Expm % nil (dat "status_txt")) sq) ))
+    (map #(struct Expm % nil (:status res)) sq) ))
+
 (defn bitly-urls->expms [sq]
-  (let [res (-> sq bitly-query-url client/get) ]
-    (if (= (:status res) 200)
-      (let [dat (-> res :body json/parse-string)]
-        (if (= (dat "status_code") 200)
-          (map keywordize ((dat "data") "expand"))
-          (map #(struct Expm % nil (dat "status_txt")) sq) ))
-      (map #(struct Expm % nil (:status res)) sq) )))
+  (parse-bitly-res (-> sq bitly-query-url client/get) sq) )
 
 (defn urls->expm-seq [sq]
   (doall (map #(future (url->expm %)) sq)) )
@@ -98,13 +101,10 @@
 
 ;;; update n-urls from table
 
-(defn do-update-done [n-url]
-  (assoc n-url :done? true :long_url (-> n-url :long_url_path first)) )
-
 (defn update-done [n-url]
   (if (re-find shorturl-regex (-> n-url :long_url_path first))
     n-url
-    (do-update-done n-url) ))
+    (assoc n-url :done? true :long_url (-> n-url :long_url_path first)) ))
 
 (defn update-looped [n-url]
   (let [long-urls (:long_url_path n-url)

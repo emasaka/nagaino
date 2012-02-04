@@ -32,14 +32,33 @@
       (is (not (contains? n-url-2-map :done)))
       (is (contains? n-url-2-map :error)) )))
 
+(deftest test-parse-location-res
+  (is (parse-location-res {:status 301
+                           :headers {"location" "http://example.com"} })
+      ["http://example.com" nil] )
+  (is (parse-location-res {:status 404})
+      [nil 404] ))
+
 (deftest test-keywordize
   (is (keywordize {"foo" 3 "bar" 5}) {:foo 3 :bar 5}) )
 
-(deftest test-do-update-done
+(deftest test-parse-bitly-res
+  (let [r1 (parse-bitly-res {:status 200 :body "{\"status_code\": 200, \"data\": {\"expand\": [{\"short_url\": \"http://foo.example.com/\", \"long_url\": \"http://example.com/foo/\"}, {\"short_url\": \"http://bar.example.com/\", \"long_url\": \"http://example.com/bar/\"}]}, \"status_txt\": \"OK\"}"} ["http://foo.example.com/" "http://bar.example.com/"]) ]
+    (is r1 [{:short_url "http://foo.example.com/"
+             :long_url "http://example.com/foo/" }
+            {:short_url "http://bar.example.com/"
+             :long_url "http://example.com/bar/" } ]))
+  (let [r2 (parse-bitly-res {:status 404}
+                            ["http://foo.example.com/" "http://bar.example.com/"])]
+    (is (map #(:long_url) r2) [nil nil]) )
+  (let [r3 (parse-bitly-res {:status 200 :body "{\"status_code\": 403, \"status_txt\": \"RATE_LIMIT_EXCEEDED\", \"data\" : null}"} ["http://foo.example.com/" "http://bar.example.com/"])]
+    (is (map #(:long_url) r3) [nil nil]) ))
+
+(deftest test-update-done
   (let [long-url "http://example.jp/"
 	n-url (string->nagaino-url "http://example.com/")
 	n-url-1 (add-url n-url long-url)
-	n-url-done (do-update-done n-url-1) ]
+	n-url-done (update-done n-url-1) ]
     (is (contains? n-url-done :done?))
     (is (= (:long_url n-url-done) long-url)) ))
 
