@@ -64,11 +64,19 @@
        "&apiKey=" bitly-key "&"
        (join "&" (map #(str "shortUrl=" (url-encode %)) sq)) ))
 
+(defn keywordize [m]
+  (reduce (fn [r v] (let [k (v 0)]
+                      (conj r {(if (string? k) (keyword k) k) (v 1)}) ))
+          {} m ))
+
 (defn bitly-urls->expms [sq]
   (let [res (-> sq bitly-query-url client/get) ]
     (if (= (:status res) 200)
-      (-> res :body json/parse-string :data :expand)
-      (map #(struct Expm (:short_url %) nil (:satus res)) sq) )))
+      (let [dat (-> res :body json/parse-string)]
+        (if (= (dat "status_code") 200)
+          (keywordize ((dat "data") "expand"))
+          (map #(struct Expm (:short_url %) nil (dat "status_txt")) sq) ))
+      (map #(struct Expm (:short_url %) nil (:status res)) sq) )))
 
 (defn urls->expm-seq [sq]
   (doall (map #(future (url->expm %)) sq)) )
