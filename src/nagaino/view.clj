@@ -2,7 +2,7 @@
   (:use [compojure.core]
 	[hiccup.page-helpers :only [html5 include-css]]
 	[hiccup.core :only [escape-html]]
-	[clojure.contrib.str-utils :only [str-join]] ))
+	[clojure.string :only [join]] ))
 
 (defn format-html-data [sq]
   (map (fn [item]
@@ -16,7 +16,7 @@
 	    [:td.data (escape-html (:long_url item))] ]
 	   [:tr
 	    [:td.title "long_url_path"]
-	    [:td.data (escape-html (str-join " ← " (:long_url_path item)))] ]
+	    [:td.data (escape-html (join " ← " (:long_url_path item)))] ]
 	   (when (:error item)
 	     [:tr
 	      [:td.title "error"]

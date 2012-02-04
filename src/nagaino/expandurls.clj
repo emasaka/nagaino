@@ -1,10 +1,10 @@
 (ns nagaino.expandurls
-  (:use [clojure.contrib.str-utils :only [str-join]]
+  (:use [clojure.string :only [join]]
 	[clojure.java.io :only [resource]]
-	[clojure.contrib.json :only [read-json]]
 	[ring.util.codec :only [url-encode]]
 	[nagaino.cache :only [expand-from-cache update-cache]] )
-  (:require [clj-http.client :as client])
+  (:require [clj-http.client :as client]
+            [clj-json.core :as json] )
   (:import [java.io InputStreamReader PushbackReader]) )
 
 ;;; config
@@ -19,7 +19,7 @@
 (defn seq->prefix-search-regex [sq]
   (re-pattern
    (str "\\A(?:"
-	(str-join "|" (map #(java.util.regex.Pattern/quote %) sq))
+	(join "|" (map #(java.util.regex.Pattern/quote %) sq))
 	")" )))
 
 (def shorturl-regex
@@ -62,13 +62,18 @@
 (defn bitly-query-url [sq]
   (str "http://api.bitly.com/v3/expand?format=json&login=" bitly-user
        "&apiKey=" bitly-key "&"
-       (str-join "&" (map #(str "shortUrl=" (url-encode %)) sq)) ))
+       (join "&" (map #(str "shortUrl=" (url-encode %)) sq)) ))
+
+(defn keywordize [m]
+  (reduce (fn [r v] (let [k (v 0)]
+                      (conj r {(if (string? k) (keyword k) k) (v 1)}) ))
+          {} m ))
 
 (defn bitly-urls->expms [sq]
   (let [res (-> sq bitly-query-url client/get) ]
     (if (= (:status res) 200)
-      (-> res :body read-json :data :expand)
-      (map #(struct Expm (:short_url %) nil (:msg res)) sq) )))
+      (keywordize (((-> res :body json/parse-string) "data") "expand"))
+      (map #(struct Expm (:short_url %) nil (:satus res)) sq) )))
 
 (defn urls->expm-seq [sq]
   (doall (map #(future (url->expm %)) sq)) )

@@ -1,7 +1,6 @@
 (ns nagaino.cache
   (:use [somnium.congomongo]
-	[somnium.congomongo.config :only [*mongo-config*]]
-	[clojure.contrib.seq-utils :only [find-first]] ))
+	[somnium.congomongo.config :only [*mongo-config*]] ))
 
 ;;; config
 
@@ -27,6 +26,9 @@
 ;;; my codes
 
 ;;; fetch
+
+(defn find-first [fn seq]
+  (first (filter fn seq)) )
 
 (defn update-from-cache [n-urls results]
   (map (fn [n-url]

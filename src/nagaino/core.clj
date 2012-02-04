@@ -2,12 +2,12 @@
   (:use [compojure.core]
 	[ring.adapter.jetty]
 	[ring.util.codec :only [url-decode]]
-	[clojure.contrib.json :only [json-str]]
-	[clojure.contrib.str-utils :only [re-split]]
+	[clojure.string :only [split]]
 	[nagaino.expandurls :only [expand-urls]]
 	[nagaino.view :only [format-html]] )
   (:require [compojure.handler :as handler]
-	    [compojure.route :as route] ))
+	    [compojure.route :as route]
+            [clj-json.core :as json] ))
 
 (defn transform-result [fmt urls]
   (case fmt
@@ -23,13 +23,13 @@
 
 (defn text->longurl [params]
   (if-let [urls (:shortUrls params)]
-    (->> urls url-decode (re-split #"\n") expand-urls)
+    (-> urls url-decode (split #"\n") expand-urls)
     () ))
 
 (defn res-json [seq]
   {:headers {"Content-Type" "application/json; charset=utf-8"
              "Access-Control-Allow-Origin" "*" }
-   :body (json-str {"status_code" 200 "data" {"expand" seq}}) } )
+   :body (json/generate-string {"status_code" 200 "data" {"expand" seq}}) } )
 
 (defn res-html [seq]
   {:headers {"Content-Type" "text/html; charset=utf-8"}

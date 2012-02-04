@@ -23,6 +23,9 @@
 	 {:match "mongodb://example.com:27017/db",
 	  :user nil :pass nil :host "example.com" :port "27017" :db "db" })) )
 
+(deftest test-find-first
+  (is (= (find-first even? (iterate inc 1)) 2)) )
+
 (deftest test-lists-starts-before
   (let [lst '("aa" "bb" "cc" "dd")]
     (is (elm= (lists-starts-before lst "aa" ()) ()))
