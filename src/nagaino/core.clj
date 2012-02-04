@@ -7,7 +7,7 @@
 	[nagaino.view :only [format-html]] )
   (:require [compojure.handler :as handler]
 	    [compojure.route :as route]
-            [clj-json.core :as json] ))
+            [cheshire.core :as json] ))
 
 (defn transform-result [fmt urls]
   (case fmt

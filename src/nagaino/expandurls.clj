@@ -4,7 +4,7 @@
 	[ring.util.codec :only [url-encode]]
 	[nagaino.cache :only [expand-from-cache update-cache]] )
   (:require [clj-http.client :as client]
-            [clj-json.core :as json] )
+            [cheshire.core :as json] )
   (:import [java.io InputStreamReader PushbackReader]) )
 
 ;;; config
@@ -64,15 +64,10 @@
        "&apiKey=" bitly-key "&"
        (join "&" (map #(str "shortUrl=" (url-encode %)) sq)) ))
 
-(defn keywordize [m]
-  (reduce (fn [r v] (let [k (v 0)]
-                      (conj r {(if (string? k) (keyword k) k) (v 1)}) ))
-          {} m ))
-
 (defn bitly-urls->expms [sq]
   (let [res (-> sq bitly-query-url client/get) ]
     (if (= (:status res) 200)
-      (keywordize (((-> res :body json/parse-string) "data") "expand"))
+      (-> res :body json/parse-string :data :expand)
       (map #(struct Expm (:short_url %) nil (:satus res)) sq) )))
 
 (defn urls->expm-seq [sq]

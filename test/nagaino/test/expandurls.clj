@@ -32,9 +32,6 @@
       (is (not (contains? n-url-2-map :done)))
       (is (contains? n-url-2-map :error)) )))
 
-(deftest test-keywordize
-  (is (keywordize {"foo" 3 "bar" 5}) {:foo 3 :bar 5}) )
-
 (deftest test-do-update-done
   (let [long-url "http://example.jp/"
 	n-url (string->nagaino-url "http://example.com/")
