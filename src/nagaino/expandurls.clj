@@ -74,9 +74,9 @@
     (if (= (:status res) 200)
       (let [dat (-> res :body json/parse-string)]
         (if (= (dat "status_code") 200)
-          (keywordize ((dat "data") "expand"))
-          (map #(struct Expm (:short_url %) nil (dat "status_txt")) sq) ))
-      (map #(struct Expm (:short_url %) nil (:status res)) sq) )))
+          (map keywordize ((dat "data") "expand"))
+          (map #(struct Expm % nil (dat "status_txt")) sq) ))
+      (map #(struct Expm % nil (:status res)) sq) )))
 
 (defn urls->expm-seq [sq]
   (doall (map #(future (url->expm %)) sq)) )
