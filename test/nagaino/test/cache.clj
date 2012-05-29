@@ -5,7 +5,7 @@
 ;;; helpers
 
 (defn elm= [a b]
-  (= (set a) (set b)) )
+  (= (group-by identity a) (group-by identity b)) )
 
 (deftest test-test-helpers
   (is (elm= '(a b c) '(a b c)))
