@@ -1,7 +1,7 @@
 (ns nagaino.view
   (:use [compojure.core]
-	[hiccup.page-helpers :only [html5 include-css]]
-	[hiccup.core :only [escape-html]]
+	[hiccup.page :only [html5 include-css]]
+	[hiccup.util :only [escape-html]]
 	[clojure.string :only [join]] ))
 
 (defn format-html-data [sq]
