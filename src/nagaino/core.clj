@@ -2,6 +2,7 @@
   (:use [compojure.core]
 	[ring.adapter.jetty]
 	[ring.util.codec :only [url-decode]]
+        [ring.middleware.file-info :only [wrap-file-info]]
 	[clojure.string :only [split]]
 	[nagaino.expandurls :only [expand-urls]]
 	[nagaino.view :only [format-html]] )
@@ -57,7 +58,7 @@
 	(api-expand-text params) )
   (route/files "/" {:root "./resources/public"}) )
 
-(def app (wrap-defaults route api-defaults))
+(def app (wrap-file-info (wrap-defaults route api-defaults)))
 
 (defn -main [& _]
   (let [port (Integer/parseInt (or (System/getenv "PORT") "8080"))]
