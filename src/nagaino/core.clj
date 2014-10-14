@@ -5,7 +5,7 @@
 	[clojure.string :only [split]]
 	[nagaino.expandurls :only [expand-urls]]
 	[nagaino.view :only [format-html]] )
-  (:require [compojure.handler :as handler]
+  (:require [ring.middleware.defaults :refer :all]
 	    [compojure.route :as route]
             [cheshire.core :as json] ))
 
@@ -57,7 +57,7 @@
 	(api-expand-text params) )
   (route/files "/" {:root "./resources/public"}) )
 
-(def app (handler/api route))
+(def app (wrap-defaults route api-defaults))
 
 (defn -main [& _]
   (let [port (Integer/parseInt (or (System/getenv "PORT") "8080"))]
