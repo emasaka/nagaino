@@ -39,7 +39,6 @@ Default is 8080.
 
 ### Run
 
-    $ lein deps
     $ lein run
 
 ## Nagaino service
