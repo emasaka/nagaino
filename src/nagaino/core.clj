@@ -59,7 +59,3 @@
   (route/files "/" {:root "./resources/public"}) )
 
 (def app (wrap-file-info (wrap-defaults route api-defaults)))
-
-(defn -main [& _]
-  (let [port (Integer/parseInt (or (System/getenv "PORT") "8080"))]
-    (run-jetty app {:port port})))

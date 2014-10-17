@@ -32,14 +32,15 @@ or:
 
 If no value is given, MongoDB is not used.
 
-#### PORT (optional)
-
-TCP port to access.
-Default is 8080.
-
 ### Run
 
-    $ lein run
+    $ lein ring server <port>
+
+or:
+
+    $ lein ring server
+
+to listen port 3000.
 
 ## Nagaino service
 
