@@ -6,6 +6,8 @@
                  [hiccup "1.0.5"]
                  [ring "1.3.1"]
                  [ring/ring-defaults "0.1.2"]
+                 [ring/ring-servlet "1.3.1"]
                  [congomongo "0.4.4"] ]
   :plugins [[lein-ring "0.8.12"]]
-  :ring {:handler nagaino.core/app} )
+  :ring {:handler nagaino.core/app}
+  :min-lein-version "2.0.0" )
