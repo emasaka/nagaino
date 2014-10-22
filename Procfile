@@ -1,1 +1,1 @@
-web: lein ring server-headless $PORT
+web: lein buildfile; lein ring server-headless $PORT
