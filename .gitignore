@@ -6,4 +6,6 @@ pom.xml.asc
 /classes/
 /checkouts
 /.lein-*
+!/.lein-classpath
 /.nrepl-port
+/resources/public/js/nagainolet.js
