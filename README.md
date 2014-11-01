@@ -34,6 +34,10 @@ If no value is given, MongoDB is not used.
 
 ### Run
 
+    $ lein buildfile
+
+then
+
     $ lein ring server <port>
 
 or:
