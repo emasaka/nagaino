@@ -71,10 +71,14 @@
 	      (into r (not-cached-list v)) ))
 	  () sq ))
 
+(def cache-update-agent (agent nil))
+
+(defn do-update-cache [_ sq]
+  (maybe-init)
+  (let [r (gather-caching-urls sq)]
+    (or (empty? r) (mass-insert! :nagainocache r)) ))
+
 (defn update-cache [sq]
   (when mongo-url
-    (future
-     (maybe-init)
-     (let [r (gather-caching-urls sq)]
-       (or (empty? r) (mass-insert! :nagainocache r)) )))
+    (send-off cache-update-agent do-update-cache sq) )
   sq )
