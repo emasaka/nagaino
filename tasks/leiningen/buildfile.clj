@@ -1,15 +1,21 @@
 (ns leiningen.buildfile
-  (:require [clojure.string])
-  (:require [clojure.java.io :as io]) )
+  (:use [cemerick.pomegranate :only [add-dependencies]])
+  (:require [clojure.string]
+            [clojure.java.io :as io] ))
+
+(add-dependencies
+ :coordinates '[[me.geso/regexp-trie "0.1.10"]]
+ :repositories cemerick.pomegranate.aether/maven-central )
+
+(import [me.geso.regexp_trie RegexpTrie])
 
 (defn make-url-re [urls]
-  (str
-   "^(?:"
-   (clojure.string/join
-    "|"
-    ;; java.util.regex.Pattern#quote don't go along well with `/'
-    (map #(clojure.string/replace % #"[/.]" "\\\\$0") urls) )
-   ")" ))
+  (str "^"
+       (-> (.regexp (reduce (fn [r v] (.add r v) r) (RegexpTrie.) urls))
+           ;; quoting `.' and `/' in regexp by string/replace is workaround
+           (clojure.string/replace #"[/.]" "\\\\$0")
+           ;; JavaScript regexp doesn't handle `\Q..\E' (workaround)
+           (clojure.string/replace "\\Q:\\E" ":") )))
 
 (defn read-url-conf []
   (let [conf (read-string (slurp "resources/config.clj"))]

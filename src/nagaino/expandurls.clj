@@ -5,7 +5,8 @@
 	[nagaino.cache :only [expand-from-cache update-cache]] )
   (:require [clj-http.client :as client]
             [cheshire.core :as json] )
-  (:import [java.io InputStreamReader PushbackReader]) )
+  (:import [java.io InputStreamReader PushbackReader]
+           [me.geso.regexp_trie RegexpTrie] ))
 
 ;;; config
 
@@ -18,9 +19,11 @@
 
 (defn seq->prefix-search-regex [sq]
   (re-pattern
-   (str "\\A(?:"
-	(join "|" (map #(java.util.regex.Pattern/quote %) sq))
-	")" )))
+   (str "\\A"
+        ;; quoting `.' in regexp by string/replace is workaround
+        (clojure.string/replace
+         (.regexp (reduce (fn [r v] (.add r v) r) (RegexpTrie.) sq))
+         "." "\\." ))))
 
 (def shorturl-regex
      (seq->prefix-search-regex

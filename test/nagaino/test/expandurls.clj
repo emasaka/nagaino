@@ -8,13 +8,13 @@
   (is (map? (read-from-resource-file "config.clj"))) )
 
 (deftest test-seq->prefix-search-regex
-  (let [re (seq->prefix-search-regex ["aa" "bb" ".*"])]
+  (let [re (seq->prefix-search-regex ["aa" "bb" "x."])]
     (is (re-find re "aaa"))
     (is (re-find re "bbb"))
-    (is (re-find re ".*"))
+    (is (re-find re "x."))
     (is (not (re-find re "xaa")))
     (is (not (re-find re "xbb")))
-    (is (not (re-find re "x.*"))) ))
+    (is (not (re-find re "xy"))) ))
 
 (deftest test-nagaino-url
   (let [url "http://example.com/"
