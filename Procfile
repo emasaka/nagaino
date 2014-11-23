@@ -1,1 +1,1 @@
-web: lein buildfile; lein ring server-headless $PORT
+web: lein buildfile; lein with-profile production trampoline ring server-headless $PORT
