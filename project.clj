@@ -12,4 +12,6 @@
   :profiles {:dev {:dependencies [[ring-mock "0.1.5"]]}}
   :plugins [[lein-ring "0.8.12"]]
   :ring {:handler nagaino.core/app}
+  :clean-targets ^{:protect false} [:target-path
+                                    "resources/public/js/nagainolet.js" ]
   :min-lein-version "2.0.0" )
