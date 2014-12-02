@@ -58,7 +58,9 @@
     (if (<= 301 code 307) [((res :headers) "location") nil] [nil code]) ))
 
 (defn url-location [^String url]
-  (parse-location-res (client/head url {:follow-redirects false})) )
+  (-> url
+      (client/head {:follow-redirects false :throw-exceptions false})
+      parse-location-res ))
 
 (defn url->expm [^String url]
   (let [[u msg] (url-location url)] (struct Expm url u msg)) )
@@ -82,7 +84,8 @@
     (map #(struct Expm % nil (:status res)) sq) ))
 
 (defn bitly-urls->expms [sq]
-  (parse-bitly-res (-> sq bitly-query-url client/get) sq) )
+  (parse-bitly-res (-> sq bitly-query-url
+                       (client/get {:throw-exceptions false}) ) sq))
 
 (defn urls->expm-seq [sq]
   (doall (map #(future (url->expm %)) sq)) )
