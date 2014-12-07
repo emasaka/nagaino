@@ -24,7 +24,7 @@
 
 (defn text->longurl [params]
   (if-let [urls (:shortUrls params)]
-    (-> urls url-decode (split #"\n") expand-urls)
+    (-> urls url-decode (split #"\r?\n") expand-urls)
     () ))
 
 (defn res-json [seq]
