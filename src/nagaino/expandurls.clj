@@ -26,8 +26,10 @@
          "." "\\." ))))
 
 (def shorturl-regex
-     (seq->prefix-search-regex
-      (into (:shorturl-hosts config) (:bitly-hosts config)) ))
+  (seq->prefix-search-regex
+   (-> (:shorturl-hosts config)
+       (into (:bitly-hosts config))
+       (into (:htnto-hosts config) ))))
 
 (def bitlyurl-regex
      (seq->prefix-search-regex (:bitly-hosts config) ))
@@ -37,6 +39,11 @@
 (def bitly-key (System/getenv "BITLY_KEY"))
 
 (def BITLY-MAX-URLS 15)
+
+(def htnto-regex
+     (seq->prefix-search-regex (:htnto-hosts config) ))
+
+(def HTNTO-MAX-URLS 15)
 
 ;;; structure
 
@@ -65,15 +72,17 @@
 (defn url->expm [^String url]
   (let [[u msg] (url-location url)] (struct Expm url u msg)) )
 
-(defn bitly-query-url [sq]
-  (str "http://api.bitly.com/v3/expand?format=json&login=" bitly-user
-       "&apiKey=" bitly-key "&"
-       (join "&" (map #(str "shortUrl=" (url-encode %)) sq)) ))
-
 (defn keywordize [m]
   (reduce (fn [r v]
             (let [k (v 0)] (conj r {(if (string? k) (keyword k) k) (v 1)})) )
           {} m ))
+
+;;; expand bit.ly URLs
+
+(defn bitly-query-url [sq]
+  (str "http://api.bitly.com/v3/expand?format=json&login=" bitly-user
+       "&apiKey=" bitly-key "&"
+       (join "&" (map #(str "shortUrl=" (url-encode %)) sq)) ))
 
 (defn parse-bitly-res [res sq]
   (if (= (:status res) 200)
@@ -84,24 +93,60 @@
     (map #(struct Expm % nil (:status res)) sq) ))
 
 (defn bitly-urls->expms [sq]
-  (parse-bitly-res (-> sq bitly-query-url
-                       (client/get {:throw-exceptions false}) ) sq))
-
-(defn urls->expm-seq [sq]
-  (doall (map #(future (url->expm %)) sq)) )
+  (-> sq bitly-query-url
+      (client/get {:throw-exceptions false})
+      (parse-bitly-res sq) ))
 
 (defn bitly-urls->expm-seq [sq]
   (doall (map #(future (bitly-urls->expms %))
 	      (partition-all BITLY-MAX-URLS sq) )))
+
+;;; expand htn.to URLs
+
+(defn htnto-query-url [sq]
+  (str "http://b.hatena.ne.jp/api/htnto/expand?"
+       (join "&" (map #(str "shortUrl=" %) sq)) ))
+
+(defn parse-htnto-res [res sq]
+  (if (= (:status res) 200)
+    (let [dat (-> res :body json/parse-string)]
+      (if (= (dat "status_code") "200")
+        (map keywordize ((dat "data") "expand"))
+        (map #(struct Expm % nil (dat "status_txt")) sq) ))
+    (map #(struct Expm % nil (:status res)) sq) ))
+
+(defn htnto-urls->expms [sq]
+  (-> sq htnto-query-url
+      (client/get {:throw-exceptions false})
+      (parse-htnto-res sq) ))
+
+(defn htnto-urls->expm-seq [sq]
+  (doall (map #(future (htnto-urls->expms %))
+	      (partition-all HTNTO-MAX-URLS sq) )))
+
+;;; update table
+
+(defn urls->expm-seq [sq]
+  (doall (map #(future (url->expm %)) sq)) )
+
+(defn url-types [url]
+  (condp #(re-find %1 %2) url
+    bitlyurl-regex :bitlyurls
+    htnto-regex :htntourls
+    :urls ))
+
+(defn expand-by-type [url-groups]
+  (map deref (concat (urls->expm-seq (:urls url-groups))
+                     (bitly-urls->expm-seq (:bitlyurls url-groups))
+                     (htnto-urls->expm-seq (:htntourls url-groups))) ))
 
 (defn update-table [table sq]
   (->> sq
        (filter #(-> % :done? not))
        (map #(-> % :long_url_path first))
        distinct
-       (group-by #(if (re-find bitlyurl-regex %) :bitlyurls :urls))
-       (#(map deref (concat (urls->expm-seq (:urls %))
-			    (bitly-urls->expm-seq (:bitlyurls %)) )))
+       (group-by url-types)
+       expand-by-type
        flatten
        (reduce (fn [r v] (conj r {(:short_url v) v})) table) ))
 
