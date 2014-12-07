@@ -54,6 +54,17 @@
   (let [r3 (parse-bitly-res {:status 200 :body "{\"status_code\": 403, \"status_txt\": \"RATE_LIMIT_EXCEEDED\", \"data\" : null}"} ["http://foo.example.com/" "http://bar.example.com/"])]
     (is (map #(:long_url) r3) [nil nil]) ))
 
+
+(deftest test-parse-htnto-res
+  (let [r1 (parse-htnto-res {:status 200 :body "{\"status_code\": \"200\", \"data\": {\"expand\": [{\"short_url\": \"http://foo.example.com/\", \"long_url\": \"http://example.com/foo/\"}, {\"short_url\": \"http://bar.example.com/\", \"long_url\": \"http://example.com/bar/\"}]}, \"status_txt\": \"OK\"}"} ["http://foo.example.com/" "http://bar.example.com/"]) ]
+    (is r1 [{:short_url "http://foo.example.com/"
+             :long_url "http://example.com/foo/" }
+            {:short_url "http://bar.example.com/"
+             :long_url "http://example.com/bar/" } ]))
+  (let [r2 (parse-htnto-res {:status 404}
+                            ["http://foo.example.com/" "http://bar.example.com/"])]
+    (is (map #(:long_url) r2) [nil nil]) ))
+
 (deftest test-update-done
   (let [long-url "http://example.jp/"
 	n-url (string->nagaino-url "http://example.com/")
