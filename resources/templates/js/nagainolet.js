@@ -35,9 +35,7 @@
         var txt2, eu;
         elm.href = newurl;
         if ((txt == oldurl) ||
-            ((txt2 = 'http://' + txt) == oldurl) ||
-            ((eu = elm.getAttribute('data-expanded-url')) &&
-             (txt2 ==  eu) )) {
+            ((txt2 = 'http://' + txt) == oldurl) ) {
             elm.innerHTML = newurl;
         }
     }
