@@ -31,12 +31,15 @@
     }
 
     function replace_element_url(elm, oldurl, newurl) {
-        var txt = elm.innerHTML;
-        var txt2, eu;
         elm.href = newurl;
-        if ((txt == oldurl) ||
-            ((txt2 = 'http://' + txt) == oldurl) ) {
-            elm.innerHTML = newurl;
+        var ch, n, txt;
+        if ((ch = elm.childNodes) &&
+	    (ch.length == 1) &&
+	    (n = ch[0]) &&
+            (n.nodeType == 3) &&
+	    (txt = n.nodeValue) &&
+            (txt == oldurl) ) {
+            n.nodeValue = newurl;
         }
     }
 
