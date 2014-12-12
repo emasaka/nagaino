@@ -60,17 +60,28 @@
 
 ;;; HTTP access
 
+
+(def REQUEST-OPTIONS {:throw-exceptions false
+                      :conn-timeout 3000
+                      :socket-timeout 3000 })
+
+(def LOCATION-REQUEST-OPTIONS (merge REQUEST-OPTIONS
+                                     {:follow-redirects false} ))
+
 (defn parse-location-res [res]
   (let [code (:status res)]
     (if (<= 301 code 307) [((res :headers) "location") nil] [nil code]) ))
 
 (defn url-location [^String url]
   (-> url
-      (client/head {:follow-redirects false :throw-exceptions false})
+      (client/head LOCATION-REQUEST-OPTIONS)
       parse-location-res ))
 
 (defn url->expm [^String url]
-  (let [[u msg] (url-location url)] (struct Expm url u msg)) )
+  (try
+    (let [[u msg] (url-location url)] (struct Expm url u msg))
+    (catch java.net.SocketTimeoutException e
+      (struct Expm url nil "Timed out") )))
 
 (defn keywordize [m]
   (reduce (fn [r v]
@@ -93,9 +104,12 @@
     (map #(struct Expm % nil (:status res)) sq) ))
 
 (defn bitly-urls->expms [sq]
-  (-> sq bitly-query-url
-      (client/get {:throw-exceptions false})
-      (parse-bitly-res sq) ))
+  (try
+    (-> sq bitly-query-url
+        (client/get REQUEST-OPTIONS)
+        (parse-bitly-res sq) )
+    (catch java.net.SocketTimeoutException e
+      (map #(struct Expm % nil "Timed out") sq) )))
 
 (defn bitly-urls->expm-seq [sq]
   (doall (map #(future (bitly-urls->expms %))
@@ -116,9 +130,12 @@
     (map #(struct Expm % nil (:status res)) sq) ))
 
 (defn htnto-urls->expms [sq]
-  (-> sq htnto-query-url
-      (client/get {:throw-exceptions false})
-      (parse-htnto-res sq) ))
+  (try
+    (-> sq htnto-query-url
+        (client/get REQUEST-OPTIONS)
+        (parse-htnto-res sq) )
+    (catch java.net.SocketTimeoutException e
+      (map #(struct Expm % nil "Timed out") sq) )))
 
 (defn htnto-urls->expm-seq [sq]
   (doall (map #(future (htnto-urls->expms %))
