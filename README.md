@@ -34,9 +34,11 @@ If no value is given, MongoDB is not used.
 
 ### Run
 
+First:
+
     $ lein buildfile
 
-then
+Then, in developing environment:
 
     $ lein ring server <port>
 
@@ -45,6 +47,14 @@ or:
     $ lein ring server
 
 to listen port 3000.
+
+In production environment:
+
+    $ lein with-profile production trampoline ring server-headless <port>
+
+or:
+
+    $ lein with-profile production trampoline ring server-headless
 
 ## Nagaino service
 
