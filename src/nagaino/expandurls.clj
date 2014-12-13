@@ -65,8 +65,8 @@
                       :conn-timeout 3000
                       :socket-timeout 3000 })
 
-(def LOCATION-REQUEST-OPTIONS (merge REQUEST-OPTIONS
-                                     {:follow-redirects false} ))
+(def LOCATION-REQUEST-OPTIONS (assoc REQUEST-OPTIONS
+                                     :follow-redirects false ))
 
 (defn parse-location-res [res]
   (let [code (:status res)]
