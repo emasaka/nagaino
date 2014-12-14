@@ -4,7 +4,8 @@
 	[ring.util.codec :only [url-encode]]
 	[nagaino.cache :only [expand-from-cache update-cache]] )
   (:require [clj-http.client :as client]
-            [cheshire.core :as json] )
+            [cheshire.core :as json]
+            [clojure.tools.logging :as log] )
   (:import [java.io InputStreamReader PushbackReader]
            [me.geso.regexp_trie RegexpTrie] ))
 
@@ -81,6 +82,7 @@
   (try
     (let [[u msg] (url-location url)] (struct Expm url u msg))
     (catch java.net.SocketTimeoutException e
+      (log/warn (str "Timed out: " url))
       (struct Expm url nil "Timed out") )))
 
 (defn keywordize [m]
@@ -109,6 +111,7 @@
         (client/get REQUEST-OPTIONS)
         (parse-bitly-res sq) )
     (catch java.net.SocketTimeoutException e
+      (log/warn "Timed out: bit.ly")
       (map #(struct Expm % nil "Timed out") sq) )))
 
 (defn bitly-urls->expm-seq [sq]
@@ -135,6 +138,7 @@
         (client/get REQUEST-OPTIONS)
         (parse-htnto-res sq) )
     (catch java.net.SocketTimeoutException e
+      (log/warn "Timed out: htn.to")
       (map #(struct Expm % nil "Timed out") sq) )))
 
 (defn htnto-urls->expm-seq [sq]

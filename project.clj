@@ -8,6 +8,7 @@
                  [ring/ring-defaults "0.1.2"]
                  [ring/ring-servlet "1.3.1"]
                  [congomongo "0.4.4"]
+                 [org.clojure/tools.logging "0.3.1"]
                  [me.geso/regexp-trie "0.1.10"] ]
   :profiles {:dev {:dependencies [[ring-mock "0.1.5"]]}}
   :plugins [[lein-ring "0.8.12"]]
