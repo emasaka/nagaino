@@ -61,7 +61,6 @@
 
 ;;; HTTP access
 
-
 (def REQUEST-OPTIONS {:throw-exceptions false
                       :conn-timeout 3000
                       :socket-timeout 3000 })
