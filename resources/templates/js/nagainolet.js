@@ -3,13 +3,17 @@
     var url_re = /{{URL_RE}}/;
     var ng_url_re = /^http:\/\/t\.co\/.*[()]$/;
 
-    // substitue of Object.keys()
-    function hash_keys(h) {
-        var ary = [];
-        for (var key in h) {
-            ary.push(key);
-        }
-        return ary;
+    if (Object.keys) {
+	var hash_keys = Object.keys;
+    } else {
+	// substitue of Object.keys()
+	var hash_keys = function(h) {
+            var ary = [];
+            for (var key in h) {
+		ary.push(key);
+            }
+            return ary;
+	};
     }
 
     function tag_each(tag, callback) {
