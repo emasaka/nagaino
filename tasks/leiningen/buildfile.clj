@@ -29,7 +29,7 @@
 (defn minify-js [dat]
   ;; workaround.  Be careful about string literals
   (-> dat
-      (replace #" //[^\n]*" "")         ; remove comments
+      (replace #"\s//[^\n]*" "")        ; remove comments
       (replace #"\s{2,}" " ")           ; compress spaces
       (replace #" (=|==|\+|<|>|&&|\|\|) (?!\!)" "$1")
       (replace #"([,!]) " "$1")
