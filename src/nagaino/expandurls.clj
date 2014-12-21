@@ -85,9 +85,9 @@
       (struct Expm url nil "Timed out") )))
 
 (defn keywordize [m]
-  (reduce (fn [r v]
-            (let [k (v 0)] (conj r {(if (string? k) (keyword k) k) (v 1)})) )
-          {} m ))
+  (reduce-kv (fn [r k v]
+               (conj r {(if (string? k) (keyword k) k) v}) )
+             {} m ))
 
 ;;; expand bit.ly URLs
 
