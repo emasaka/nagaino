@@ -2,7 +2,8 @@
   (:refer-clojure :exclude [replace])
   (:use [cemerick.pomegranate :only [add-dependencies]]
         [clojure.string :only [replace]] )
-  (:require [clojure.java.io :as io]) )
+  (:require [clojure.java.io :as io]
+            [clojure.edn :as edn] ))
 
 (add-dependencies
  :coordinates '[[me.geso/regexp-trie "0.1.10"]]
@@ -19,7 +20,7 @@
            (replace "\\Q:\\E" ":") )))
 
 (defn read-url-conf []
-  (let [conf (read-string (slurp "resources/config.clj"))]
+  (let [conf (edn/read-string (slurp "resources/config.edn"))]
     (into (:shorturl-hosts conf) (:bitly-hosts conf)) ))
 
 (defn apply-template [tmpl dat]

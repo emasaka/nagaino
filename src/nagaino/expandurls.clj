@@ -5,7 +5,8 @@
 	[nagaino.cache :only [expand-from-cache update-cache]] )
   (:require [clj-http.client :as client]
             [cheshire.core :as json]
-            [clojure.tools.logging :as log] )
+            [clojure.tools.logging :as log]
+            [clojure.edn :as edn] )
   (:import [java.io InputStreamReader PushbackReader]
            [me.geso.regexp_trie RegexpTrie] ))
 
@@ -14,9 +15,9 @@
 (defn read-from-resource-file [file]
   (with-open [strm (-> file resource .openStream
                        InputStreamReader. PushbackReader. )]
-    (read strm) ))
+    (edn/read strm) ))
 
-(def config (read-from-resource-file "config.clj"))
+(def config (read-from-resource-file "config.edn"))
 
 (defn seq->prefix-search-regex [sq]
   (re-pattern
