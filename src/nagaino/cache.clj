@@ -1,6 +1,7 @@
 (ns nagaino.cache
   (:use [somnium.congomongo]
-	[somnium.congomongo.config :only [*mongo-config*]] ))
+	[somnium.congomongo.config :only [*mongo-config*]] )
+  (:require [clojure.tools.logging :as log]) )
 
 ;;; config
 
@@ -44,10 +45,14 @@
 
 (defn expand-from-cache [sq]
   (if mongo-url
-    (do (maybe-init)
-	(let [rs (->> sq (map #(->> % :long_url_path first))
-		      (#(fetch :nagainocache :where {:short_url {:$in %}} ))) ]
-	  (update-from-cache sq rs) ))
+    (try
+      (maybe-init)
+      (let [rs (->> sq (map #(->> % :long_url_path first))
+                    (#(fetch :nagainocache :where {:short_url {:$in %}} ))) ]
+        (update-from-cache sq rs) )
+      (catch Exception e
+        (log/error (str "caught exception: " (.getMessage e)))
+        () ))
     sq ))
 
 ;;; insert
@@ -74,9 +79,13 @@
 (def cache-update-agent (agent nil))
 
 (defn do-update-cache [_ sq]
-  (maybe-init)
-  (let [r (gather-caching-urls sq)]
-    (or (empty? r) (mass-insert! :nagainocache r)) ))
+  (try
+    (maybe-init)
+    (let [r (gather-caching-urls sq)]
+      (or (empty? r) (mass-insert! :nagainocache r)) )
+    (catch Exception e
+      (log/error (str "caught exception: " (.getMessage e)))
+      nil )))
 
 (defn update-cache [sq]
   (when mongo-url
