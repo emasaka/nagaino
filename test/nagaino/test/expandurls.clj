@@ -1,11 +1,12 @@
 (ns nagaino.test.expandurls
   (:use [nagaino.expandurls]
-	[clojure.test] ))
+	[clojure.test] )
+  (:require [clojure.edn :as edn]) )
 
 ;;; tests for nagaino.expandurls
 
 (deftest test-read-from-resource-file
-  (is (map? (read-from-resource-file "config.clj"))) )
+  (is (map? (read-from-resource-file "config.edn"))) )
 
 (deftest test-seq->prefix-search-regex
   (let [re (seq->prefix-search-regex ["aa" "bb" "x."])]
