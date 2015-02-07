@@ -52,7 +52,7 @@
         (update-from-cache sq rs) )
       (catch Exception e
         (log/error (str "caught exception: " (.getMessage e)))
-        () ))
+        sq ))
     sq ))
 
 ;;; insert
