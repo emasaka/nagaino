@@ -1,15 +1,13 @@
 (ns nagaino.cache
-  (:use [somnium.congomongo]
-	[somnium.congomongo.config :only [*mongo-config*]] )
-  (:require [clojure.tools.logging :as log]) )
+  (:use [somnium.congomongo.config :only [*mongo-config*]] )
+  (:require [somnium.congomongo :as mongo]
+            [clojure.tools.logging :as log] ))
 
 ;;; config
 
 (def mongo-url (System/getenv "MONGOHQ_URL"))
 
-;;; copied from
-;;; http://thecomputersarewinning.com/post/clojure-heroku-noir-mongo
-;;; and modified
+;;; connection management
 
 (defn split-mongo-url [url]
   (let [matcher (re-matcher #"^.*://(?:(.*?):(.*?)@)?(.*?):(\d+)/(.*)$" url)]
@@ -17,14 +15,17 @@
       (zipmap [:match :user :pass :host :port :db] (re-groups matcher)) )))
 
 (defn maybe-init []
-  (when-not (connection? *mongo-config*)
-    (let [config (split-mongo-url mongo-url)]
-      (mongo! :db (:db config) :host (:host config)
-	      :port (Integer. (:port config)) )
-      (when-let [user (:user config)]
-	(authenticate user (:pass config)) ))))
-
-;;; my codes
+  (dosync
+   (when-not (mongo/connection? *mongo-config*)
+     (let [config (split-mongo-url mongo-url)
+           conn (mongo/make-connection
+                 (:db config)
+                 :host (:host config) :port (Integer. (:port config))
+                 (mongo/mongo-options :connect-timeout 1000
+                                      :socket-timeout 1000 )) ]
+       (mongo/set-connection! conn)
+       (when-let [user (:user config)]
+         (mongo/authenticate conn user (:pass config)) )))))
 
 ;;; fetch
 
@@ -47,9 +48,9 @@
   (if mongo-url
     (try
       (maybe-init)
-      (let [rs (->> sq (map #(->> % :long_url_path first))
-                    (#(fetch :nagainocache :where {:short_url {:$in %}} ))) ]
-        (update-from-cache sq rs) )
+      (->> sq (map #(->> % :long_url_path first))
+           (#(mongo/fetch :nagainocache :where {:short_url {:$in %}} ))
+           (update-from-cache sq) )
       (catch Exception e
         (log/error (str "caught exception: " (.getMessage e)))
         sq ))
@@ -82,7 +83,7 @@
   (try
     (maybe-init)
     (let [r (gather-caching-urls sq)]
-      (or (empty? r) (mass-insert! :nagainocache r)) )
+      (or (empty? r) (mongo/mass-insert! :nagainocache r)) )
     (catch Exception e
       (log/error (str "caught exception: " (.getMessage e)))
       nil )))
