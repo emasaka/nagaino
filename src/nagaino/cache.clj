@@ -21,7 +21,7 @@
        (mongo/set-connection!
         (mongo/make-connection (:db config)
          :host (:host config) :port (Integer. (:port config))
-         (mongo/mongo-options :connect-timeout 1000 :socket-timeout 1000) ))
+         (mongo/mongo-options :socket-timeout 1000) ))
        (when-let [user (:user config)]
          (mongo/authenticate user (:pass config)) )))))
 
