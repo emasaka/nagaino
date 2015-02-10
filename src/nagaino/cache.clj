@@ -17,15 +17,13 @@
 (defn maybe-init []
   (dosync
    (when-not (mongo/connection? *mongo-config*)
-     (let [config (split-mongo-url mongo-url)
-           conn (mongo/make-connection
-                 (:db config)
-                 :host (:host config) :port (Integer. (:port config))
-                 (mongo/mongo-options :connect-timeout 1000
-                                      :socket-timeout 1000 )) ]
-       (mongo/set-connection! conn)
+     (let [config (split-mongo-url mongo-url)]
+       (mongo/set-connection!
+        (mongo/make-connection (:db config)
+         :host (:host config) :port (Integer. (:port config))
+         (mongo/mongo-options :connect-timeout 1000 :socket-timeout 1000) ))
        (when-let [user (:user config)]
-         (mongo/authenticate conn user (:pass config)) )))))
+         (mongo/authenticate user (:pass config)) )))))
 
 ;;; fetch
 
