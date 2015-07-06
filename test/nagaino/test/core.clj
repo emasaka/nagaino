@@ -19,4 +19,5 @@
   (testing "top page route"
     (let [response (app (mock/request :get "/"))]
       (is (= (:status response) 200))
-      (is (= (some-> response :headers (get "Content-Type")) "text/html")) )))
+      (is (.startsWith (some-> response :headers (get "Content-Type"))
+                       "text/html" )) )))
