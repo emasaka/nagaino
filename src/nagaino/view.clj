@@ -1,8 +1,8 @@
 (ns nagaino.view
-  (:use [compojure.core]
-	[hiccup.page :only [html5 include-css]]
-	[hiccup.util :only [escape-html]]
-	[clojure.string :only [join]] ))
+  (:require [compojure.core :refer :all]
+            [hiccup.page :refer [html5 include-css]]
+            [hiccup.util :refer [escape-html]]
+            [clojure.string :refer [join]] ))
 
 (defn format-html-data [sq]
   (map (fn [item]

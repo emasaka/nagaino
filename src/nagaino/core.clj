@@ -1,12 +1,12 @@
 (ns nagaino.core
-  (:use [compojure.core]
-	[ring.adapter.jetty]
-	[ring.util.codec :only [url-decode]]
-	[clojure.string :only [split]]
-	[nagaino.expandurls :only [expand-urls]]
-	[nagaino.view :only [format-html]] )
-  (:require [ring.middleware.defaults :refer :all]
-	    [compojure.route :as route]
+  (:require [compojure.core :refer :all]
+            [ring.adapter.jetty]
+            [ring.util.codec :refer [url-decode]]
+            [clojure.string :refer [split]]
+            [nagaino.expandurls :refer [expand-urls]]
+            [nagaino.view :refer [format-html]]
+            [ring.middleware.defaults :refer :all]
+            [compojure.route :as route]
             [cheshire.core :as json] ))
 
 (defn transform-result [fmt urls]

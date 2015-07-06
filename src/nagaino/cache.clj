@@ -1,6 +1,6 @@
 (ns nagaino.cache
-  (:use [somnium.congomongo.config :only [*mongo-config*]] )
-  (:require [somnium.congomongo :as mongo]
+  (:require [somnium.congomongo.config :refer [*mongo-config*]]
+            [somnium.congomongo :as mongo]
             [clojure.tools.logging :as log] ))
 
 ;;; config

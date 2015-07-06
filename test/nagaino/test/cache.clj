@@ -1,6 +1,6 @@
 (ns nagaino.test.cache
-  (:use [nagaino.cache]
-	[clojure.test] ))
+  (:require [nagaino.cache :refer :all]
+            [clojure.test :refer :all] ))
 
 ;;; helpers
 

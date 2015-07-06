@@ -1,9 +1,9 @@
 (ns nagaino.expandurls
-  (:use [clojure.string :only [join]]
-	[clojure.java.io :only [resource]]
-	[ring.util.codec :only [url-encode]]
-	[nagaino.cache :only [expand-from-cache update-cache]] )
-  (:require [clj-http.client :as client]
+  (:require [clojure.string :refer [join]]
+            [clojure.java.io :refer [resource]]
+            [ring.util.codec :refer [url-encode]]
+            [nagaino.cache :refer [expand-from-cache update-cache]]
+            [clj-http.client :as client]
             [cheshire.core :as json]
             [clojure.tools.logging :as log]
             [clojure.edn :as edn] )

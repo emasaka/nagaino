@@ -1,7 +1,7 @@
 (ns nagaino.test.core
-  (:use [nagaino.core]
-	[clojure.test]
-        [ring.mock.request :as mock] ))
+  (:require [nagaino.core :refer :all]
+            [clojure.test :refer :all]
+            [ring.mock.request :as mock] ))
 
 (deftest test-transform-result
   (let [urls [{:short_url "short1" :long_url "long1"}

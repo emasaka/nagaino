@@ -1,7 +1,7 @@
 (ns nagaino.test.expandurls
-  (:use [nagaino.expandurls]
-	[clojure.test] )
-  (:require [clojure.edn :as edn]) )
+  (:require [nagaino.expandurls :refer :all]
+            [clojure.test :refer :all]
+            [clojure.edn :as edn]) )
 
 ;;; tests for nagaino.expandurls
 
