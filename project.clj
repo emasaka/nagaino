@@ -7,7 +7,7 @@
                  [ring "1.3.2"]
                  [ring/ring-defaults "0.1.5"]
                  [ring/ring-servlet "1.3.2"]
-                 [congomongo "0.4.4"]
+                 [congomongo "0.4.6"]
                  [org.clojure/tools.logging "0.3.1"]
                  [me.geso/regexp-trie "1.0.2"] ]
   :profiles {:dev {:dependencies [[ring-mock "0.1.5"]]}}
