@@ -1,6 +1,5 @@
 (ns nagaino.core
   (:require [compojure.core :refer :all]
-            [ring.adapter.jetty]
             [ring.util.codec :refer [url-decode]]
             [clojure.string :refer [split]]
             [nagaino.expandurls :refer [expand-urls]]
