@@ -9,7 +9,7 @@
                  [ring/ring-servlet "1.3.2"]
                  [congomongo "0.4.6"]
                  [org.clojure/tools.logging "0.3.1"]
-                 [me.geso/regexp-trie "1.0.2"] ]
+                 [me.geso/regexp-trie "1.0.5"] ]
   :profiles {:dev {:dependencies [[ring-mock "0.1.5"]]}}
   :plugins [[lein-ring "0.9.6"]]
   :ring {:handler nagaino.core/app}
