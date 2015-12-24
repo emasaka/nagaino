@@ -11,6 +11,7 @@
  :bitly-hosts ("http://bit.ly/" "http://j.mp/" "http://amzn.to/"
                "http://s.nikkei.com/" "http://t.asahi.com/" "http://nyti.ms/"
                "http://tcrn.ch/" "http://huff.to/" "http://on.cnn.com/"
-               "http://e8.biz/" "http://reut.rs/" "http://nkbp.jp/" )
+               "http://e8.biz/" "http://reut.rs/" "http://nkbp.jp/"
+               "http://buff.ly")
  :htnto-hosts ("http://htn.to/")
  }
