@@ -3,7 +3,8 @@
   (:use [cemerick.pomegranate :only [add-dependencies]]
         [clojure.string :only [replace]] )
   (:require [clojure.java.io :as io]
-            [clojure.edn :as edn] ))
+            [clojure.edn :as edn]
+            [cheshire.core :as json] ))
 
 (add-dependencies
  :coordinates '[[me.geso/regexp-trie "0.1.10"]]
@@ -39,12 +40,18 @@
       (replace #"([()]) ([()])" "$1$2")
       (replace #"(if|for) \(" "$1(") ))
 
-(defn build-js []
+(defn build-js [urls]
   (.mkdirs (io/file "resources/public/js"))
   (spit "resources/public/js/nagainolet.js"
         (-> (slurp "resources/templates/js/nagainolet.js")
-            (apply-template {:URL_RE (make-url-re (read-url-conf))})
+            (apply-template {:URL_RE (make-url-re urls)})
             (minify-js) )))
 
+(defn build-hosts-json [urls]
+  (spit "resources/public/hosts.json"
+        (json/generate-string urls) ))
+
 (defn buildfile [project]
-  (build-js) )
+  (let [urls (read-url-conf)]
+    (build-js urls)
+    (build-hosts-json urls) ))

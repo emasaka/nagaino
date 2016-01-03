@@ -9,4 +9,5 @@ pom.xml.asc
 !/.lein-classpath
 /.nrepl-port
 /resources/public/js/nagainolet.js
+/resources/public/hosts.json
 TAGS

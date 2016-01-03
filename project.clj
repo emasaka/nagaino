@@ -13,5 +13,6 @@
   :plugins [[lein-ring "0.9.6"]]
   :ring {:handler nagaino.core/app}
   :clean-targets ^{:protect false} [:target-path
-                                    "resources/public/js/nagainolet.js" ]
+                                    "resources/public/js/nagainolet.js"
+                                    "resources/public/hosts.json" ]
   :min-lein-version "2.0.0" )
