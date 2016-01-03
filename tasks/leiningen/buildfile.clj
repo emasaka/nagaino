@@ -21,7 +21,7 @@
 
 (defn read-url-conf []
   (let [conf (edn/read-string (slurp "resources/config.edn"))]
-    (into (:shorturl-hosts conf) (:bitly-hosts conf)) ))
+    (concat (:shorturl-hosts conf) (:htnto-hosts conf) (:bitly-hosts conf)) ))
 
 (defn apply-template [tmpl dat]
   ;; workaround
