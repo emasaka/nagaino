@@ -1,8 +1,8 @@
 (ns leiningen.buildfile
   (:refer-clojure :exclude [replace])
-  (:use [cemerick.pomegranate :only [add-dependencies]]
-        [clojure.string :only [replace]] )
-  (:require [clojure.java.io :as io]
+  (:require [cemerick.pomegranate :refer [add-dependencies]]
+            [clojure.string :refer [replace]]
+            [clojure.java.io :as io]
             [clojure.edn :as edn]
             [cheshire.core :as json] ))
 
