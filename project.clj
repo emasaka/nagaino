@@ -1,6 +1,6 @@
 (defproject nagaino "0.0.1-SNAPSHOT"
   :description "bulk expander of shortened URLs"
-  :dependencies [[org.clojure/clojure "1.7.0"]
+  :dependencies [[org.clojure/clojure "1.8.0"]
                  [clj-http "2.0.1"]
                  [cheshire "5.5.0"]
                  [compojure "1.4.0"]
