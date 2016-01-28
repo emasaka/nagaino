@@ -57,7 +57,7 @@
     }
 
     function call_nagaino(urls) {
-        var endpoint = 'http://nagaino.herokuapp.com/api/v0/expandText';
+        var endpoint = 'http://{{HOSTNAME}}/api/v0/expandText';
         var xhr;
         function cbfunc() {
             var rtn = JSON.parse(xhr.responseText);

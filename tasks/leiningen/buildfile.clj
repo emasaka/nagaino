@@ -20,13 +20,18 @@
            ;; JavaScript regexp doesn't handle `\Q..\E' (workaround)
            (replace "\\Q:\\E" ":") )))
 
-(defn read-url-conf []
+(defn read-conf []
   (let [conf (edn/read-string (slurp "resources/config.edn"))]
-    (concat (:shorturl-hosts conf) (:htnto-hosts conf) (:bitly-hosts conf)) ))
+    {:urls (concat (:shorturl-hosts conf)
+                   (:htnto-hosts conf)
+                   (:bitly-hosts conf) )
+     :hostname (:hostname conf) }))
 
 (defn apply-template [tmpl dat]
   ;; workaround
-  (replace tmpl "{{URL_RE}}" (:URL_RE dat)) )
+  (-> tmpl
+      (replace "{{URL_RE}}" (:URL_RE dat))
+      (replace "{{HOSTNAME}}" (:HOSTNAME dat)) ))
 
 (defn minify-js [dat]
   ;; workaround.  Be careful about string literals
@@ -40,11 +45,11 @@
       (replace #"([()]) ([()])" "$1$2")
       (replace #"(if|for) \(" "$1(") ))
 
-(defn build-js [urls]
+(defn build-js [urls hostname]
   (.mkdirs (io/file "resources/public/js"))
   (spit "resources/public/js/nagainolet.js"
         (-> (slurp "resources/templates/js/nagainolet.js")
-            (apply-template {:URL_RE (make-url-re urls)})
+            (apply-template {:URL_RE (make-url-re urls) :HOSTNAME hostname})
             (minify-js) )))
 
 (defn build-hosts-json [urls]
@@ -52,6 +57,6 @@
         (json/generate-string urls) ))
 
 (defn buildfile [project]
-  (let [urls (read-url-conf)]
-    (build-js urls)
+  (let [{urls :urls hostname :hostname} (read-conf)]
+    (build-js urls hostname)
     (build-hosts-json urls) ))
