@@ -7,7 +7,7 @@
             [cheshire.core :as json] ))
 
 (add-dependencies
- :coordinates '[[me.geso/regexp-trie "0.1.10"]]
+ :coordinates '[[me.geso/regexp-trie "1.0.5"]]
  :repositories cemerick.pomegranate.aether/maven-central )
 
 (import [me.geso.regexp_trie RegexpTrie])
