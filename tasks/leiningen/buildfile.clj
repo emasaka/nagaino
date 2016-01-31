@@ -27,11 +27,10 @@
                    (:bitly-hosts conf) )
      :hostname (:hostname conf) }))
 
-(defn apply-template [tmpl dat]
-  ;; workaround
-  (-> tmpl
-      (replace "{{URL_RE}}" (:URL_RE dat))
-      (replace "{{HOSTNAME}}" (:HOSTNAME dat)) ))
+(defn render-template [tmpl dat]
+  (reduce (fn [r v] (replace r (str "{{" (name v) "}}") (dat v)))
+          tmpl
+          (keys dat) ))
 
 (defn minify-js [dat]
   ;; workaround.  Be careful about string literals
@@ -49,7 +48,7 @@
   (.mkdirs (io/file "resources/public/js"))
   (spit "resources/public/js/nagainolet.js"
         (-> (slurp "resources/templates/js/nagainolet.js")
-            (apply-template {:URL_RE (make-url-re urls) :HOSTNAME hostname})
+            (render-template {:URL_RE (make-url-re urls) :HOSTNAME hostname})
             (minify-js) )))
 
 (defn build-hosts-json [urls]
