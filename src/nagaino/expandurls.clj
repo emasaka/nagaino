@@ -101,7 +101,7 @@
   (if (= (:status res) 200)
     (let [dat (-> res :body json/parse-string)]
       (if (= (dat "status_code") 200)
-        (map keywordize ((dat "data") "expand"))
+        (map keywordize (get-in dat ["data" "expand"]))
         (map #(struct Expm % nil (dat "status_txt")) sq) ))
     (map #(struct Expm % nil (:status res)) sq) ))
 
@@ -128,7 +128,7 @@
   (if (= (:status res) 200)
     (let [dat (-> res :body json/parse-string)]
       (if (= (dat "status_code") "200")
-        (map keywordize ((dat "data") "expand"))
+        (map keywordize (get-in dat ["data" "expand"]))
         (map #(struct Expm % nil (dat "status_txt")) sq) ))
     (map #(struct Expm % nil (:status res)) sq) ))
 
