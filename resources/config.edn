@@ -1,6 +1,6 @@
 {:shorturl-hosts ("http://t.co/" "https://t.co/" "http://tinyurl.com/"
                   "http://is.gd/" "http://wp.me/" "http://ff.im/"
-		  "http://goo.gl/" "https://goo.gl" "http://spr.ly/"
+		  "http://goo.gl/" "https://goo.gl/" "http://spr.ly/"
 		  "http://tr.im/" "http://short.to/" "http://ow.ly/"
 		  "http://u.nu/" "http://twurl.nl/" "http://icio.us/"
 		  "http://cot.ag/" "http://ht.ly/"
@@ -12,7 +12,7 @@
                "http://s.nikkei.com/" "http://t.asahi.com/" "http://nyti.ms/"
                "http://tcrn.ch/" "http://huff.to/" "http://on.cnn.com/"
                "http://e8.biz/" "http://reut.rs/" "http://nkbp.jp/"
-               "http://buff.ly")
+               "http://buff.ly/")
  :htnto-hosts ("http://htn.to/")
  :hostname "nagaino.herokuapp.com"
  }
