@@ -28,9 +28,8 @@
      :hostname (:hostname conf) }))
 
 (defn render-template [tmpl dat]
-  (reduce (fn [r v] (replace r (str "{{" (name v) "}}") (dat v)))
-          tmpl
-          (keys dat) ))
+  (reduce-kv (fn [r k v] (replace r (str "{{" (name k) "}}") v))
+             tmpl dat ))
 
 (defn minify-js [dat]
   ;; workaround.  Be careful about string literals
