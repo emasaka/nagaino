@@ -50,6 +50,11 @@
             (render-template {:URL_RE (make-url-re urls) :HOSTNAME hostname})
             (minify-js) )))
 
+(defn build-html [hostname]
+  (spit "resources/public/doc/example.html"
+        (-> (slurp "resources/templates/doc/example.html")
+            (render-template { :HOSTNAME hostname}) )))
+
 (defn build-hosts-json [urls]
   (spit "resources/public/hosts.json"
         (json/generate-string urls) ))
@@ -57,4 +62,5 @@
 (defn buildfile [project]
   (let [{urls :urls hostname :hostname} (read-conf)]
     (build-js urls hostname)
+    (build-html hostname)
     (build-hosts-json urls) ))

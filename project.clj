@@ -15,6 +15,7 @@
   :ring {:handler nagaino.core/app}
   :clean-targets ^{:protect false} [:target-path
                                     "resources/public/js/nagainolet.js"
+                                    "resources/public/doc/example.html"
                                     "resources/public/hosts.json" ]
   :jvm-opts ["-Dclojure.compiler.direct-linking=true"]
   :min-lein-version "2.0.0" )
