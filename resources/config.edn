@@ -12,7 +12,7 @@
                "http://s.nikkei.com/" "http://t.asahi.com/" "http://nyti.ms/"
                "http://tcrn.ch/" "http://huff.to/" "http://on.cnn.com/"
                "http://e8.biz/" "http://reut.rs/" "http://nkbp.jp/"
-               "http://buff.ly/" "http://amba.to/")
+               "http://buff.ly/" "http://amba.to/" "http://bloom.bg")
  :htnto-hosts ("http://htn.to/")
  :hostname "nagaino.herokuapp.com"
  }
