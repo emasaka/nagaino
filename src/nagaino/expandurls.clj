@@ -85,6 +85,14 @@
       (log/warn (str "Timed out: " url))
       (struct Expm url nil "Timed out") )))
 
+(defn urls->expm-seq [sq]
+  (->> sq
+       (group-by #(re-find #"\Ahttps?://[^/]*" %))
+       vals
+       (map (fn [grp] (future (client/with-connection-pool {}
+                                (map #(url->expm %) grp) ))))
+       doall ))
+
 (defn keywordize [m]
   (reduce-kv (fn [r k v]
                (conj r {(if (string? k) (keyword k) k) v}) )
@@ -146,9 +154,6 @@
 	      (partition-all HTNTO-MAX-URLS sq) )))
 
 ;;; update table
-
-(defn urls->expm-seq [sq]
-  (doall (map #(future (url->expm %)) sq)) )
 
 (defn url-types [url]
   (condp #(re-find %1 %2) url
