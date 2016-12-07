@@ -64,7 +64,8 @@
 
 (def REQUEST-OPTIONS {:throw-exceptions false
                       :conn-timeout 3000
-                      :socket-timeout 3000 })
+                      :socket-timeout 3000
+                      :client-params {:cookie-policy (constantly nil)} })
 
 (def LOCATION-REQUEST-OPTIONS (assoc REQUEST-OPTIONS
                                      :follow-redirects false ))
