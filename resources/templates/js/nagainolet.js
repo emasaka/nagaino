@@ -40,7 +40,7 @@
         if ((ch = elm.childNodes) &&
 	    (ch.length == 1) &&
 	    (n = ch[0]) &&
-            (n.nodeType == 3) &&
+            (n.nodeType == node.TEXT_NODE) &&
 	    (txt = n.nodeValue) &&
             (txt == oldurl) ) {
             n.nodeValue = newurl;
