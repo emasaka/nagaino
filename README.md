@@ -55,7 +55,3 @@ In production environment:
 or:
 
     $ lein with-profile production trampoline ring server-headless
-
-## Nagaino service
-
-http://nagaino.herokuapp.com/
